@@ -68,9 +68,7 @@
         </nav>
       </div>
 
-      <div flex-no-shrink>
-        <div ui-include="'{{ asset('layouts/views/blocks/aside.bottom.0.html') }}'"></div>
-      </div>
+      
     </div>
   </div>
   

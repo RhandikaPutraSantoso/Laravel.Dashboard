@@ -18,6 +18,7 @@
 <div class="padding">
     <h2>REQUESTS FOR SAP</h2>
     <div class="padding">
+        <a href="{{ route('user.activity.actionreport.tambah') }}" class="btn btn-primary mb-3">ADD ACTIVITY</a>
         <div class="box">
             <div class="box-header">
                 <h2>Aktivitas Perusahaan</h2>
@@ -72,7 +73,7 @@
                         @endforeach
                     </tbody>
                 </table>
-              <a href="{{ route('user.activity.actionreport.tambah') }}" class="btn btn-primary mb-3">ADD ACTIVITY</a>
+              
             </div>
         </div>
     </div>

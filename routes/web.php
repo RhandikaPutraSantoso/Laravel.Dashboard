@@ -33,8 +33,32 @@ Route::middleware('checklogin')->group(callback: function () {
     Route::post('/admin/activity/solved/ubah/{id}', [DashboardController::class, 'activityUpdateSolved'])->name('admin.activity.actionsolved.update');
 
     Route::get('/admin/pengaturan/email', [DashboardController::class, 'email'])->name('admin.pengaturan.email');
+    Route::delete('/admin/pengaturan/email/delete/{id}', [DashboardController::class, 'emailDestroy'])->name('admin.pengaturan.email.destroy');
+    Route::get('admin/pengaturan/email/tambah', [DashboardController::class, 'emailTambah'])->name('admin.pengaturan.actionemail.tambah');
+    Route::post('/admin/pengaturan/email/store', [DashboardController::class, 'emailStore'])->name('admin.pengaturan.email.store');
+    Route::get('/admin/pengaturan/email/ubah/{id}', [DashboardController::class, 'emailEdit'])->name('admin.pengaturan.actionemail.ubah');
+    Route::put('/admin/pengaturan/email/ubah/{id}', [DashboardController::class, 'emailUpdate'])->name('admin.pengaturan.actionemail.update');
+    
+
+
+
+
     Route::get('/admin/pengaturan/difficult', [DashboardController::class, 'difficult'])->name('admin.pengaturan.difficult');
+    Route::delete('/admin/pengaturan/difficult/delete/{id}', [DashboardController::class, 'difficultDestroy'])->name('admin.pengaturan.difficult.destroy');
+    Route::get('admin/pengaturan/difficult/tambah', [DashboardController::class, 'difficultTambah'])->name('admin.pengaturan.actiondifficult.tambah');
+    Route::post('/admin/pengaturan/difficult/store', [DashboardController::class, 'difficultStore'])->name('admin.pengaturan.difficult.store');
+    Route::get('/admin/pengaturan/difficult/ubah/{id}', [DashboardController::class, 'difficultEdit'])->name('admin.pengaturan.actiondifficult.ubah');
+    Route::put('/admin/pengaturan/difficult/ubah/{id}', [DashboardController::class, 'difficultUpdate'])->name('admin.pengaturan.actiondifficult.update');
+
+
+
     Route::get('/admin/pengaturan/status', [DashboardController::class, 'status'])->name('admin.pengaturan.status');
+    Route::delete('/admin/pengaturan/status/delete/{id}', [DashboardController::class, 'statusDestroy'])->name('admin.pengaturan.status.destroy');
+    Route::get('admin/pengaturan/status/tambah', [DashboardController::class, 'statusTambah'])->name('admin.pengaturan.actionstatus.tambah');
+    Route::post('/admin/pengaturan/status/store', [DashboardController::class, 'statusStore'])->name('admin.pengaturan.status.store');
+    Route::get('/admin/pengaturan/status/ubah/{id}', [DashboardController::class, 'statusEdit'])->name('admin.pengaturan.actionstatus.ubah');
+    Route::put('/admin/pengaturan/status/ubah/{id}', [DashboardController::class, 'statusUpdate'])->name('admin.pengaturan.actionstatus.update');
+
 
 });
 

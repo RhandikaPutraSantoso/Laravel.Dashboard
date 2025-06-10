@@ -54,12 +54,13 @@
 
     <!-- Tabel -->
     <br><br>
+    <div class="padding">
     <div class="box">
         <div class="box-header">
             <h2>Aktivitas Perusahaan</h2>
         </div>
-        <div class="box-body">
-            <table id="table" class="table table-striped">
+        <div class="table-responsive" data-target="bg">
+            <table id="table" class="table table-striped b-t b-b dataTable no-footer display-inline">
                 <thead>
                     <tr>
                         <th>No</th>
@@ -83,6 +84,7 @@
             </table>
         </div>
     </div>
+</div>
 </div>
 
 <!-- Chart Script -->

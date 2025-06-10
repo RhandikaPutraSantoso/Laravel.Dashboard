@@ -11,6 +11,48 @@
   <meta name="mobile-web-app-capable" content="yes">
 
     @include('admin.components.css')
+    <style>
+
+.drop-zone {
+    border: 3px dashed #ccc;
+    border-radius: 20px;
+    padding: 40px;
+    text-align: center;
+    color: #666;
+    background-color: #f8f9fa;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    font-size: 1.1rem;
+    position: relative;
+}
+
+.drop-zone.dragover {
+    border-color: #4aa8ff;
+    background-color: #e0f3ff;
+    color: #333;
+}
+
+.preview-container {
+    margin-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+}
+
+.preview-container img {
+    width: 100px;
+    height: 100px;
+    border-radius: 12px;
+    object-fit: cover;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    transition: transform 0.2s ease;
+}
+
+.preview-container img:hover {
+    transform: scale(1.05);
+}
+</style>
 </head>
 <body>
     @include('admin.components.sidebar')
@@ -59,13 +101,16 @@
 
     <div class="form-group">
         <label>Upload Foto</label>
-        <div id="drop-zone" class="drop-zone">
-            <p>Drag and drop files here or click to select files.</p>
+        <div class="dz-message" ui-jp="dropzone" >
+        <div id="drop-zone" class="drop-zone dropzone white" >
+            <h4 class="m-t-lg m-b-md">Drop files here or click to upload.</h4>
             <input type="file" id="file-input" name="foto[]" multiple accept="image/*" class="drop-zone-input" style="display:none;">
             <div class="drop-zone-icon">
                 <i class="glyphicon glyphicon-upload" style="font-size: 48px; color: #888;"></i>
             </div>
+            
             <div id="preview" class="preview-container"></div>
+        </div>
         </div>
     </div>
 

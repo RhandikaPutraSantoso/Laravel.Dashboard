@@ -18,8 +18,10 @@
 <div class="padding">
     <h2>REQUESTS FOR SAP</h2>
     <div class="padding">
+        
         <div class="box">
             <div class="box-header">
+                <a href="{{ route('admin.activity.actionreport.tambah') }}" class="pull-right btn btn-primary mb-3"> + ADD ACTIVITY</a>
                 <h2>Aktivitas Perusahaan</h2>
             </div>
             <div class="table-responsive" data-target="bg">
@@ -91,14 +93,15 @@
                         @endforeach
                     </tbody>
                 </table>
-              <a href="{{ route('admin.activity.actionreport.tambah') }}" class="btn btn-primary mb-3"> + ADD ACTIVITY</a>
+              
               
             </div>
         </div>
     </div>
 </div>
 
-<p>ygvtvtrde</p>
+
+
 
   <!-- ############ PAGE END-->
    

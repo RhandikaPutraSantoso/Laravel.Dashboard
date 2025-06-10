@@ -11,6 +11,7 @@
   <meta name="mobile-web-app-capable" content="yes">
 
     @include('user.components.css')
+    
 </head>
 <body>
     @include('user.components.sidebar')
@@ -58,17 +59,22 @@
             <input type="text" class="form-control" name="Subject" value="Aktivitas Baru..." required>
         </div>
 
-        <div class="form-group">
+    <div class="form-group">
         <label>Upload Foto</label>
-        <div id="drop-zone" class="drop-zone">
-            <p>Drag and drop files here or click to select files.</p>
+        <div class="dz-message" ui-jp="dropzone" >
+        <div id="drop-zone" class="drop-zone dropzone white" >
+            <h4 class="m-t-lg m-b-md">Drop files here or click to upload.</h4>
             <input type="file" id="file-input" name="foto[]" multiple accept="image/*" class="drop-zone-input" style="display:none;">
             <div class="drop-zone-icon">
                 <i class="glyphicon glyphicon-upload" style="font-size: 48px; color: #888;"></i>
             </div>
+            
             <div id="preview" class="preview-container"></div>
         </div>
+        </div>
     </div>
+
+
 
         <div class="form-group">
             <label>Deskripsi</label>

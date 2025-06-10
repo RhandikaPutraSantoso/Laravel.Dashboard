@@ -32,7 +32,7 @@
 
             <li>
               {{-- Check if any sub-item is active to keep the parent expanded --}}
-              <a class="{{ Request::is('report') || Request::is('status') || Request::is('solved') ? 'active' : '' }}">
+              <a class="{{ Request::is('admin.activity.report') || Request::is('admin.activity.status') || Request::is('admin.activity.solved') ? 'active' : '' }}">
                 <span class="nav-caret">
                   <i class="fa fa-caret-down"></i>
                 </span>

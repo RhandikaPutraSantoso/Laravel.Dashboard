@@ -696,27 +696,379 @@ class dashboardController extends Controller
 
 
 
-    public function email()
+     public function email()
     {
         if (!session('admin_sap')) {
-           abort(404); // Activity not found
+            abort(404);
         }
-        return view('admin.pengaturan.email');
+
+        $koneksi = HanaConnection::getConnection();
+        $emailSettings = $koneksi->query("SELECT * FROM SBO_CMNP_KK.EMAIL_SAP")->fetchAll(\PDO::FETCH_ASSOC);
+
+        return view('admin.pengaturan.email', compact('emailSettings'));
     }
+
+public function emailDestroy($id)
+{
+    if (!session('admin_sap')) {
+        abort(404);
+    }
+
+    $koneksi = HanaConnection::getConnection();
+    $id = (int) $id;
+
+    $sqlDelete = "DELETE FROM SBO_CMNP_KK.EMAIL_SAP WHERE ID_EMAIL = $id";
+    $koneksi->exec($sqlDelete);
+
+    return redirect()->route('admin.pengaturan.email')->with('success', 'Email setting deleted successfully.');
+}
+
+
+
+  public function emailUpdate(Request $request, $id)
+{
+    if (!session('admin_sap')) {
+        abort(404);
+    }
+
+    $request->validate([
+        'NM_EMAIL' => 'required|email|max:255',
+    ]);
+
+    $koneksi = HanaConnection::getConnection();
+    $id = (int) $id;
+    $nm_email = addslashes($request->NM_EMAIL); // atau gunakan htmlspecialchars()
+
+    // Cek duplikat
+    $sqlCek = "SELECT COUNT(*) AS JML FROM SBO_CMNP_KK.EMAIL_SAP WHERE NM_EMAIL = '$nm_email' AND ID_EMAIL != $id";
+    $result = $koneksi->query($sqlCek)->fetch();
+    if ($result['JML'] > 0) {
+        return redirect()->back()->withErrors(['Email sudah digunakan.']);
+    }
+
+    // Update langsung pakai exec()
+    $sqlUpdate = "UPDATE SBO_CMNP_KK.EMAIL_SAP SET NM_EMAIL = '$nm_email' WHERE ID_EMAIL = $id";
+    $koneksi->exec($sqlUpdate);
+
+    return redirect()->route('admin.pengaturan.email')->with('success', 'Email berhasil diperbarui.');
+}
+
+
+
+    public function emailTambah()
+    {
+        if (!session('admin_sap')) {
+            abort(404);
+        }
+
+        return view('admin.pengaturan.actionemail.tambah');
+    }
+
+    public function emailStore(Request $request)
+{
+    if (!session('admin_sap')) {
+        abort(404);
+    }
+
+    $request->validate([
+        'email' => 'required|email|max:255',
+    ]);
+
+    $koneksi = HanaConnection::getConnection();
+
+    // Cek duplikat email secara langsung (query biasa)
+    $email = $request->email;
+    $sqlCheck = "SELECT COUNT(*) AS TOTAL FROM SBO_CMNP_KK.EMAIL_SAP WHERE NM_EMAIL = '$email'";
+    $result = $koneksi->query($sqlCheck)->fetch(\PDO::FETCH_ASSOC);
+
+    if ($result['TOTAL'] > 0) {
+        return redirect()->back()->withErrors(['email' => 'Email sudah digunakan.']);
+    }
+
+    // Ambil ID_EMAIL terakhir dan tambah 1
+    $sqlMaxId = "SELECT MAX(ID_EMAIL) AS MAX_ID FROM SBO_CMNP_KK.EMAIL_SAP";
+    $resultId = $koneksi->query($sqlMaxId)->fetch(\PDO::FETCH_ASSOC);
+    $nextId = (int) $resultId['MAX_ID'] + 1;
+
+    // Simpan email baru
+    $sqlInsert = "INSERT INTO SBO_CMNP_KK.EMAIL_SAP (ID_EMAIL, NM_EMAIL) VALUES ($nextId, '$email')";
+    $koneksi->exec($sqlInsert);
+
+    return redirect()->route('admin.pengaturan.email')->with('success', 'Email added successfully.');
+}
+
+
+    public function cekEmail(Request $request)
+    {
+        if (!session('admin_sap')) {
+            return response()->json(['status' => 'unauthorized'], 403);
+        }
+
+        $email = $request->input('email');
+        $excludeId = $request->input('exclude_id');
+
+        $koneksi = HanaConnection::getConnection();
+
+        $query = "SELECT COUNT(*) FROM SBO_CMNP_KK.EMAIL_SAP WHERE NM_EMAIL = ?";
+        $params = [$email];
+
+        if ($excludeId) {
+            $query .= " AND ID_EMAIL != ?";
+            $params[] = $excludeId;
+        }
+
+        $stmt = $koneksi->prepare($query);
+        $stmt->execute($params);
+        $exists = $stmt->fetchColumn() > 0;
+
+        return response()->json(['exists' => $exists]);
+    }
+
+    public function emailEdit($id)
+{
+    if (!session('admin_sap')) {
+        abort(404); // Unauthorized access
+    }
+
+    $koneksi = HanaConnection::getConnection();
+
+    // Validasi ID untuk memastikan integer
+    if (!is_numeric($id)) {
+        abort(400, 'Invalid ID');
+    }
+
+    // Query langsung tanpa prepare-execute
+    $email = $koneksi->query("SELECT * FROM SBO_CMNP_KK.EMAIL_SAP WHERE ID_EMAIL = {$id}")->fetch(\PDO::FETCH_ASSOC);
+
+    if (!$email) {
+        abort(404); // Data tidak ditemukan
+    }
+
+    return view('admin.pengaturan.actionemail.ubah', compact('email'));
+}
+
+
+
+
+
+
+
 
     public function difficult()
     {
         if (!session('admin_sap')) {
            abort(404); // Activity not found
         }
-        return view('admin.pengaturan.difficult');
+        $koneksi = HanaConnection::getConnection();
+        $difficultSettings = $koneksi->query("SELECT * FROM SBO_CMNP_KK.KATEGORI")->fetchAll(\PDO::FETCH_ASSOC);
+        if (!$difficultSettings) {
+            abort(404); // No difficult settings found
+        }
+       
+        return view('admin.pengaturan.difficult', compact('difficultSettings'));
     }
+
+    public function difficultDestroy($id)
+    {
+        if (!session('admin_sap')) {
+            abort(404); // Unauthorized access
+        }
+
+        $koneksi = HanaConnection::getConnection();
+        $id = (int) $id;
+
+        $sqlDelete = "DELETE FROM SBO_CMNP_KK.KATEGORI WHERE ID_KATEGORI = $id";
+        $koneksi->exec($sqlDelete);
+
+        return redirect()->route('admin.pengaturan.difficult')->with('success', 'Difficult setting deleted successfully.');
+    }
+
+    public function difficultTambah()
+    {
+        if (!session('admin_sap')) {
+            abort(404); // Unauthorized access
+        }
+
+        return view('admin.pengaturan.actiondifficult.tambah');
+    }
+
+    public function difficultStore(Request $request)
+    {
+        if (!session('admin_sap')) {
+            abort(404); // Unauthorized access
+        }
+
+        $request->validate([
+            'nama_kategori' => 'required|max:255|min:3', // Validasi nama kategori
+            
+        ]);
+
+        $koneksi = HanaConnection::getConnection();
+
+        // Ambil ID_KATEGORI terakhir dan tambah 1
+        $sqlMaxId = "SELECT MAX(ID_KATEGORI) AS MAX_ID FROM SBO_CMNP_KK.KATEGORI";
+        $resultId = $koneksi->query($sqlMaxId)->fetch(\PDO::FETCH_ASSOC);
+        $nextId = (int) $resultId['MAX_ID'] + 1;
+
+        // Simpan kategori baru
+        $sqlInsert = "INSERT INTO SBO_CMNP_KK.KATEGORI (ID_KATEGORI, NAMA_KATEGORI) VALUES ($nextId, '{$request->nama_kategori}')";
+        $koneksi->exec($sqlInsert);
+
+        return redirect()->route('admin.pengaturan.difficult')->with('success', 'Difficult level added successfully.');
+    }
+
+    public function difficultEdit($id)
+    {
+        if (!session('admin_sap')) {
+            abort(404); // Unauthorized access
+        }
+
+        $koneksi = HanaConnection::getConnection();
+
+        // Validasi ID untuk memastikan integer
+        if (!is_numeric($id)) {
+            abort(400, 'Invalid ID');
+        }
+
+        // Query langsung tanpa prepare-execute
+        $difficult = $koneksi->query("SELECT * FROM SBO_CMNP_KK.KATEGORI WHERE ID_KATEGORI = {$id}")->fetch(\PDO::FETCH_ASSOC);
+
+        if (!$difficult) {
+            abort(404); // Data tidak ditemukan
+        }
+
+        return view('admin.pengaturan.actiondifficult.ubah', compact('difficult'));
+    }
+
+    public function difficultUpdate(Request $request, $id)
+    {
+        if (!session('admin_sap')) {
+            abort(404); // Unauthorized access
+        }
+
+        $request->validate([
+            'nama_kategori' => 'required|max:255|min:3', // Validasi nama kategori
+            // Tambahkan validasi lain sesuai kebutuhan
+
+        ]);
+
+        $koneksi = HanaConnection::getConnection();
+
+        // Update kategori
+        $sqlUpdate = "UPDATE SBO_CMNP_KK.KATEGORI SET NAMA_KATEGORI = '{$request->nama_kategori}' WHERE ID_KATEGORI = {$id}";
+        $koneksi->exec($sqlUpdate);
+
+        return redirect()->route('admin.pengaturan.difficult')->with('success', 'Difficult level updated successfully.');
+    }
+
 
     public function status()
     {
         if (!session('admin_sap')) {
            abort(404); // Activity not found
         }
-        return view('admin.pengaturan.status');
+        $koneksi = HanaConnection::getConnection();
+        $statusSettings = $koneksi->query("SELECT * FROM SBO_CMNP_KK.STATUS_LEVEL")->fetchAll(\PDO::FETCH_ASSOC);
+
+        if (!$statusSettings) {
+            abort(404); // No status settings found
+        }
+        return view('admin.pengaturan.status', compact('statusSettings'));
     }
+
+    public function statusDestroy($id)
+    {
+        if (!session('admin_sap')) {
+            abort(404); // Unauthorized access
+        }
+
+        $koneksi = HanaConnection::getConnection();
+        $id = (int) $id;
+
+        $sqlDelete = "DELETE FROM SBO_CMNP_KK.STATUS_LEVEL WHERE ID_STATUS = $id";
+        $koneksi->exec($sqlDelete);
+
+        return redirect()->route('admin.pengaturan.status')->with('success', 'Status setting deleted successfully.');
+    }
+
+    public function statusTambah()
+    {
+        if (!session('admin_sap')) {
+            abort(404); // Unauthorized access
+        }
+
+        return view('admin.pengaturan.actionstatus.tambah');
+    }
+    
+    public function statusStore(Request $request)
+    {
+        if (!session('admin_sap')) {
+            abort(404); // Unauthorized access
+        }
+
+        $request->validate([
+            'nama_status' => 'required|max:255|min:3', // Validasi nama status
+            
+        ]);
+
+        $koneksi = HanaConnection::getConnection();
+
+        // Ambil ID_STATUS terakhir dan tambah 1
+        $sqlMaxId = "SELECT MAX(ID_STATUS) AS MAX_ID FROM SBO_CMNP_KK.STATUS_LEVEL";
+        $resultId = $koneksi->query($sqlMaxId)->fetch(\PDO::FETCH_ASSOC);
+        $nextId = (int) $resultId['MAX_ID'] + 1;
+
+        // Simpan status baru
+        $sqlInsert = "INSERT INTO SBO_CMNP_KK.STATUS_LEVEL (ID_STATUS, NM_STATUS) VALUES ($nextId, '{$request->nama_status}')";
+        $koneksi->exec($sqlInsert);
+
+        return redirect()->route('admin.pengaturan.status')->with('success', 'Status level added successfully.');
+    }
+    
+    public function statusEdit($id)
+    {
+        if (!session('admin_sap')) {
+            abort(404); // Unauthorized access
+        }
+
+        $koneksi = HanaConnection::getConnection();
+
+        // Validasi ID untuk memastikan integer
+        if (!is_numeric($id)) {
+            abort(400, 'Invalid ID');
+        }
+
+        // Query langsung tanpa prepare-execute
+        $status = $koneksi->query("SELECT * FROM SBO_CMNP_KK.STATUS_LEVEL WHERE ID_STATUS = {$id}")->fetch(\PDO::FETCH_ASSOC);
+
+        if (!$status) {
+            abort(404); // Data tidak ditemukan
+        }
+
+        return view('admin.pengaturan.actionstatus.ubah', compact('status'));
+    }
+
+    public function statusUpdate(Request $request, $id)
+    {
+        if (!session('admin_sap')) {
+            abort(404); // Unauthorized access
+        }
+
+        $request->validate([
+            'nama_status' => 'required|max:255|min:3', // Validasi nama status
+            
+
+        ]);
+
+        $koneksi = HanaConnection::getConnection();
+
+        // Update status
+        $sqlUpdate = "UPDATE SBO_CMNP_KK.STATUS_LEVEL SET NM_STATUS = '{$request->nama_status}' WHERE ID_STATUS = {$id}";
+        $koneksi->exec($sqlUpdate);
+
+        return redirect()->route('admin.pengaturan.status')->with('success', 'Status level updated successfully.');
+    }
+
+
+
 }
