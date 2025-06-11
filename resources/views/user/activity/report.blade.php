@@ -18,10 +18,10 @@
 <div class="padding">
     <h2>REQUESTS FOR SAP</h2>
     <div class="padding">
-        <a href="{{ route('user.activity.actionreport.tambah') }}" class="btn btn-primary mb-3">ADD ACTIVITY</a>
         <div class="box">
             <div class="box-header">
                 <h2>Aktivitas Perusahaan</h2>
+                <a href="{{ route('user.activity.actionreport.tambah') }}" class="pull-right btn btn-primary mb-3"> + ADD ACTIVITY</a>
             </div>
             <div class="table-responsive" data-target="bg">
                 <table id="table" class="table table-striped b-t b-b dataTable no-footer display-inline">

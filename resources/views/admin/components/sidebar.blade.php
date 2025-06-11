@@ -20,7 +20,7 @@
 
             <li>
               {{-- Compare the current URL with '/index' or pass a variable from the controller --}}
-              <a href="{{ Route('admin.dashboardAdmin') }}" class="{{ Request::is('index') ? 'active' : '' }}">
+              <a href="{{ route('admin.dashboardAdmin') }}" class="{{ Request::routeIs('admin.dashboardAdmin') ? 'active' : '' }}">
                 <span class="nav-icon">
                   <i class="material-icons">&#xe3fc;
                     <span ui-include="'{{ asset('layouts/assets/images/i_0.svg') }}'"></span>
@@ -32,7 +32,7 @@
 
             <li>
               {{-- Check if any sub-item is active to keep the parent expanded --}}
-              <a class="{{ Request::is('admin.activity.report') || Request::is('admin.activity.status') || Request::is('admin.activity.solved') ? 'active' : '' }}">
+              <a class="{{ Request::routeIs('admin.activity.report', 'admin.activity.status', 'admin.activity.solved') ? 'active' : '' }}">
                 <span class="nav-caret">
                   <i class="fa fa-caret-down"></i>
                 </span>
@@ -47,15 +47,17 @@
                 <span class="nav-text">Activity SAP</span>
               </a>
               <ul class="nav-sub">
-                <li><a href="{{ route('admin.activity.report') }}">Activity Report</a></li>
-                <li><a href="{{ route('admin.activity.status') }}">Activity Status</a></li>
-                <li><a href="{{ route('admin.activity.solved') }}">Activity Solved</a></li>
+                <li><a href="{{ route('admin.activity.report') }}" class="{{ Request::routeIs('admin.activity.report') ? 'active' : '' }}">Activity Report</a></li>
+                <li><a href="{{ route('admin.activity.status') }}" class="{{ Request::routeIs('admin.activity.status') ? 'active' : '' }}">Activity Status</a></li>
+                <li><a href="{{ route('admin.activity.solved') }}" class="{{ Request::routeIs('admin.activity.solved') ? 'active' : '' }}">Activity Solved</a></li>
+
               </ul>
             </li>
 
             <li>
               {{-- Check if any sub-item is active to keep the parent expanded --}}
-              <a class="{{ Request::is('email') || Request::is('difficult') || Request::is('status') ? 'active' : '' }}">
+              <a class="{{ Request::routeIs('admin.pengaturan.email', 'admin.pengaturan.difficult', 'admin.pengaturan.status') ? 'active' : '' }}">
+
                 <span class="nav-caret">
                   <i class="fa fa-caret-down"></i>
                 </span>
@@ -70,9 +72,10 @@
                 <span class="nav-text">Setting</span>
               </a>
               <ul class="nav-sub">
-                <li><a href="{{ route('admin.pengaturan.email') }}">Email</a></li>
-                <li><a href="{{ route('admin.pengaturan.difficult') }}">Difficult Level</a></li>
-                <li><a href="{{ route('admin.pengaturan.status') }}">Status Level</a></li>
+                  <li><a href="{{ route('admin.pengaturan.email') }}" class="{{ Request::routeIs('admin.pengaturan.email') ? 'active' : '' }}">Email</a></li>
+                  <li><a href="{{ route('admin.pengaturan.difficult') }}" class="{{ Request::routeIs('admin.pengaturan.difficult') ? 'active' : '' }}">Difficult Level</a></li>
+                  <li><a href="{{ route('admin.pengaturan.status') }}" class="{{ Request::routeIs('admin.pengaturan.status') ? 'active' : '' }}">Status Level</a></li>
+
               </ul>
             </li>
 

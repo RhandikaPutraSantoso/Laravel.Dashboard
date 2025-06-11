@@ -17,7 +17,7 @@
   <div class="padding">
     <h2>CHANGE ACTIVITY STATUS</h2>
 
-    <form method="POST" action="{{ route('admin.activity.actionsolved.update', ['id' => $activity['ID_ACTIVITY']]) }}" enctype="multipart/form-data" >
+    <form method="POST" action="{{ route('admin.activity.actionstatus.update', ['id' => $activity['ID_ACTIVITY']]) }}" enctype="multipart/form-data" >
       @csrf
     
 
