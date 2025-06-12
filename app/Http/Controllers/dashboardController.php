@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Helpers\HanaConnection;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Session;
 
 
@@ -80,6 +82,116 @@ class dashboardController extends Controller
 
         return view('admin.activity.report', compact('activities'));
     }
+            public function cetakBeritaAcara($id)
+{   
+    date_default_timezone_set("Asia/Jakarta");
+
+    if (!session('admin_sap')) {
+        abort(403, 'Unauthorized');
+    }
+
+    $koneksi = HanaConnection::getConnection();
+
+    if (!is_numeric($id)) {
+        abort(400, 'Invalid ID');
+    }
+
+    $sql = "
+        SELECT 
+            A.*, 
+            C.NM_COMPANY,
+            K.NAMA_KATEGORI 
+        FROM SBO_CMNP_KK.ACTIVITY A
+        LEFT JOIN SBO_CMNP_KK.COMPANY_SAP C ON A.ID_COMPANY = C.ID_COMPANY
+        LEFT JOIN SBO_CMNP_KK.KATEGORI K ON A.ID_KATEGORI = K.ID_KATEGORI
+        WHERE A.ID_ACTIVITY = '$id'
+    ";
+
+    $activity = $koneksi->query($sql)->fetch(\PDO::FETCH_ASSOC);
+
+    if (!$activity) {
+        abort(404, 'Activity not found');
+    }
+
+    // Ambil satu foto pertama
+    $foto = $koneksi->query("SELECT NM_ACTIVITY_FOTO FROM SBO_CMNP_KK.ACTIVITY_FOTO WHERE ID_ACTIVITY = '$id' LIMIT 1")
+                   ->fetch(\PDO::FETCH_ASSOC);
+    $activity['FOTO'] = $foto['NM_ACTIVITY_FOTO'] ?? null;
+
+    // Ambil semua foto
+    $fotos = $koneksi->query("SELECT * FROM SBO_CMNP_KK.ACTIVITY_FOTO WHERE ID_ACTIVITY = '$id'")->fetchAll(\PDO::FETCH_ASSOC);
+
+    // Peta logo berdasarkan nama perusahaan
+    $logoMap = [
+        'cmnp' => public_path('layouts/assets/images/cmnp.png'),
+        'cmnpproper' => public_path('layouts/assets/images/cmnproper.png'),
+        'cms' => public_path('layouts/assets/images/cms.png'),
+        'cpi' => public_path('layouts/assets/images/cpi.png'),
+        'cmlj' => public_path('layouts/assets/images/cmlj.png'),
+        'cw' => public_path('layouts/assets/images/cw.jpg'),
+        'ckjt' => public_path('layouts/assets/images/ckjt.jpg'),
+    ];
+
+    // Peta alamat berdasarkan nama perusahaan
+    $alamatMap = [
+        'cmnp' => [
+            'alamat' => 'Jl. Yos Sudarso Kavling No.28 3, RT.3/RW.11, Sunter Jaya, Kec. Tj. Priok, Jkt Utara, Daerah Khusus Ibukota Jakarta 14350',
+            'telepon' => '(021) 65306930',
+            'email' => 'cmnp@citra.co.id',
+        ],
+        'cmnpproper' => [
+            'alamat' => 'Jl. Properti Raya No. 12, Bekasi',
+            'telepon' => '(021) 88888777',
+            'email' => 'cs@cmnpproper.co.id',
+        ],
+        'cms' => [
+            'alamat' => 'Jl. Wisata Menanggal No.21, Dukuh Menanggal, Kec. Gayungan, Surabaya, Jawa Timur 60234',
+            'telepon' => '(0251) 7654321',
+            'email' => 'kontak@cms.co.id',
+        ],
+        'cpi' => [
+            'alamat' => 'Jl. Angkasa No.20, RT.12/RW.2, Gn. Sahari Sel., Kec. Kemayoran, Kota Jakarta Pusat, Daerah Khusus Ibukota Jakarta 10610',
+            'telepon' => '(0267) 8881122',
+            'email' => 'info@cpi.co.id',
+        ],
+        'cmlj' => [
+            'alamat' => 'Jalan Kutawaringin Rt 01 Rw 11 No 1, Kopo, Kec. Kutawaringin, Kabupaten Bandung, Jawa Barat 40911',
+            'telepon' => '(021) 5553332',
+            'email' => 'admin@cmlj.co.id',
+        ],
+        'cw' => [
+            'alamat' => 'Jl. Tol Depok - Antasari No.100, RT.4/RW.2, Cilandak Bar., Kec. Cilandak, Kota Jakarta Selatan, Daerah Khusus Ibukota Jakarta 12450',
+            'telepon' => '(0264) 432100',
+            'email' => 'support@cw.co.id',
+        ],
+        'ckjt' => [
+            'alamat' => 'Jl. Raya Cimalaka Cipadung No.115, Licin, Kec. Cimalaka, Kabupaten Sumedang, Jawa Barat 45353',
+            'telepon' => '(0233) 882211',
+            'email' => 'info@ckjt.co.id',
+        ],
+    ];
+
+    // Tentukan key perusahaan
+    $companyKey = strtolower($activity['NM_COMPANY']);
+    $logoPath = $logoMap[$companyKey] ?? public_path('layouts/assets/images/cmnp.png');
+    $alamatData = $alamatMap[$companyKey] ?? [
+        'alamat' => 'Alamat tidak tersedia',
+        'telepon' => '-',
+        'email' => '-',
+    ];
+
+    // Gabungkan data alamat ke dalam activity
+    $activity['ALAMAT_COMPANY'] = $alamatData['alamat'];
+    $activity['TELP_COMPANY'] = $alamatData['telepon'];
+    $activity['MAIL_COMPANY'] = $alamatData['email'];
+
+    // Generate PDF
+    $pdf = PDF::loadView('admin.activity.berita_acara_pdf', compact('activity', 'logoPath', 'alamatData', 'fotos'))
+              ->setPaper('A4', 'portrait');
+
+    return $pdf->stream('berita_acara_' . $id . '.pdf');
+}
+
 
             public function activitydestroy($id)
             {

@@ -56,39 +56,36 @@
     });
 
     // DataTable untuk tabel utama dengan tombol export
-    var table = $('#table').DataTable({
-      responsive: true,
-      dom:
-        "<'row mb-3'<'col-md-3'l><'col-md-6 text-center'B><'col-md-3'f>>" +
-        "<'row'<'col-md-12'tr>>" +
-        "<'row mt-2'<'col-md-5'i><'col-md-7'p>>",
-      buttons: [
-        {
-          extend: 'csv',
-          className: 'btn btn-outline-info btn-sm me-1'
-        },
-        {
-          extend: 'excel',
-          className: 'btn btn-outline-success btn-sm me-1'
-        },
-        {
-          extend: 'pdf',
-          className: 'btn btn-outline-danger btn-sm me-1'
-        },
-        {
-          extend: 'print',
-          className: 'btn btn-outline-primary btn-sm'
-        }
-      ],
-      lengthMenu: [
-        [5, 10, 25, 50, 100, -1],
-        [5, 10, 25, 50, 100, "All"]
-
-        
-      
-
-      ]
-    });
+    $('#table').DataTable({
+  responsive: true,
+  order: [[0, 'desc']], // Menambahkan baris ini
+  dom:
+    "<'row mb-3'<'col-md-3'l><'col-md-6 text-center'B><'col-md-3'f>>" +
+    "<'row'<'col-md-12'tr>>" +
+    "<'row mt-2'<'col-md-5'i><'col-md-7'p>>",
+  buttons: [
+    {
+      extend: 'csv',
+      className: 'btn btn-outline-info btn-sm me-1'
+    },
+    {
+      extend: 'excel',
+      className: 'btn btn-outline-success btn-sm me-1'
+    },
+    {
+      extend: 'pdf',
+      className: 'btn btn-outline-danger btn-sm me-1'
+    },
+    {
+      extend: 'print',
+      className: 'btn btn-outline-primary btn-sm'
+    }
+  ],
+  lengthMenu: [
+    [5, 10, 25, 50, 100, -1],
+    [5, 10, 25, 50, 100, "All"]
+  ]
+});
 
     // Tempatkan tombol ke posisi khusus di DOM
     table.buttons().container().appendTo('#table_wrapper .col-md-6:eq');

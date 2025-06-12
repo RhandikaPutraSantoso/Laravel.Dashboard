@@ -15,15 +15,15 @@
 </head>
 <body>
     @include('admin.components.sidebar')
-<div class="padding">
+<div class="padding white">
     
     <h1>Selamat Datang di Administrator CMNP GROUP Official </h1>
     <br>
 
     <!-- Form Filter -->
-    <form method="GET" class="m-b-lg">
+    <form method="GET" class="m-b-lg white">
         <label for="bulan">Bulan:</label>
-        <select name="bulan" class="display-inline">
+        <select name="bulan" class="display-inline ">
             <option value="">Semua</option>
             @for ($i = 1; $i <= 12; $i++)
                 <option value="{{ $i }}" {{ request('bulan') == $i ? 'selected' : '' }}>
@@ -33,7 +33,7 @@
         </select>
 
         <label for="tahun">Tahun:</label>
-        <select name="tahun" class="display-inline">
+        <select name="tahun" class=" display-inline ">
             <option value="">Semua</option>
             @for ($y = date('Y'); $y >= date('Y') - 5; $y--)
                 <option value="{{ $y }}" {{ request('tahun') == $y ? 'selected' : '' }}>{{ $y }}</option>
@@ -45,7 +45,7 @@
 
     <!-- Chart -->
     <canvas id="bar-chart"></canvas>
-    <div id="custom-legend" style="display:flex; flex-wrap:wrap; justify-content:center; margin-top:20px; gap:20px;"></div>
+    <div id="custom-legend" class="white" style="display:flex; flex-wrap:wrap; justify-content:center; margin-top:20px; gap:20px;"></div>
 
     <!-- Tombol Reset -->
     <div style="text-align:center; margin-top:10px;">
@@ -54,7 +54,7 @@
 
     <!-- Tabel -->
     <br><br>
-    <div class="padding">
+    <div class="padding ">
     <div class="box">
         <div class="box-header">
             <h2>Aktivitas Perusahaan</h2>
