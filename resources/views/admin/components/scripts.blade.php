@@ -58,7 +58,7 @@
     // DataTable untuk tabel utama dengan tombol export
     $('#table').DataTable({
   responsive: true,
-  order: [[0, 'desc']], // Menambahkan baris ini
+  order: [[0, 'desc']], 
   dom:
     "<'row mb-3'<'col-md-3'l><'col-md-6 text-center'B><'col-md-3'f>>" +
     "<'row'<'col-md-12'tr>>" +
@@ -91,3 +91,42 @@
     table.buttons().container().appendTo('#table_wrapper .col-md-6:eq');
   });
 </script>
+
+<script>
+function loadNotifications() {
+  $.ajax({
+    url: '{{ url("/get-notifications") }}',
+    method: 'GET',
+    success: function (res) {
+      // Update badge count
+      $('#notif-count').text(res.report.count)
+      $('#activity-sap-count').text(res.report.count + res.status.count + res.solved.count);
+      $('#activity-sap-sub-count').text(res.report.count);
+      $('#activity-status-sub-count').text(res.status.count);
+      $('#activity-solved-sub-count').text(res.solved.count);
+
+      // Optional: update dropdown dengan detail no tiket dari report
+      let html = '';
+      if (res.report.items.length > 0) {
+        res.report.items.forEach(item => {
+          let routeUrl = `{{ route('admin.activity.actionreport.ubah', ':id') }}`.replace(':id', item.ID_ACTIVITY);
+          html += `<a class="dropdown-item" href="${routeUrl}"><strong>No Tiket:</strong> ${item.TIKET}</a>`;
+        });
+      } else {
+        html = '<div class="dropdown-item text-muted">Tidak ada notifikasi baru</div>';
+      }
+      $('#notif-items').html(html);
+    },
+    error: function () {
+      console.error("Gagal memuat notifikasi.");
+    }
+  });
+}
+
+loadNotifications();
+setInterval(loadNotifications, 10000);
+</script>
+
+
+
+

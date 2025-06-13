@@ -16,6 +16,8 @@ Route::get('/admin/dashboardAdmin', [DashboardController::class, 'index'])->midd
 
 // Grouped protected routes
 Route::middleware('checklogin')->group(callback: function () {
+    Route::get('/get-notifications', [App\Http\Controllers\dashboardController::class, 'fetch']);
+
     Route::get('/admin/activity/report', [DashboardController::class, 'activityReport'])->name('admin.activity.report');
     Route::get('/admin/activity/berita-acara/{id}', [DashboardController::class, 'cetakBeritaAcara'])->name('admin.activity.berita_acara_pdf');
 

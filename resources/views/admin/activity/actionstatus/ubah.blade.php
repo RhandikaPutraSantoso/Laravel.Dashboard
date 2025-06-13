@@ -93,14 +93,6 @@
       </div>
 
       <div class="form-group">
-        <label>Komentar</label>
-        <textarea name="komentar" class="form-control" id="komentar" rows="8">{{ old('komentar', $activity['KOMENTAR']) }}</textarea>
-        @error('komentar')
-          <small class="text-danger">{{ $message }}</small>
-        @enderror
-      </div>
-
-      <div class="form-group">
         <label>Status Level</label>
         <select class="form-control" name="ID_STATUS" required>
           <option value="">Pilih Status</option>

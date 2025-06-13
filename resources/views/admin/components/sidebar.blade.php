@@ -30,29 +30,45 @@
               </a>
             </li>
 
-            <li>
-              {{-- Check if any sub-item is active to keep the parent expanded --}}
-              <a class="{{ Request::routeIs('admin.activity.report', 'admin.activity.status', 'admin.activity.solved') ? 'active' : '' }}">
-                <span class="nav-caret">
-                  <i class="fa fa-caret-down"></i>
-                </span>
-                <span class="nav-label">
-                  <b class="label rounded label-sm primary">3</b>
-                </span>
-                <span class="nav-icon">
-                  <i class="material-icons">&#xe5c3;
-                    <span ui-include="'{{ asset('layouts/assets/images/i_1.svg') }}'"></span>
-                  </i>
-                </span>
-                <span class="nav-text">Activity SAP</span>
-              </a>
-              <ul class="nav-sub">
-                <li><a href="{{ route('admin.activity.report') }}" class="{{ Request::routeIs('admin.activity.report') ? 'active' : '' }}">Activity Report</a></li>
-                <li><a href="{{ route('admin.activity.status') }}" class="{{ Request::routeIs('admin.activity.status') ? 'active' : '' }}">Activity Status</a></li>
-                <li><a href="{{ route('admin.activity.solved') }}" class="{{ Request::routeIs('admin.activity.solved') ? 'active' : '' }}">Activity Solved</a></li>
+          <li>
+            {{-- Check if any sub-item is active to keep the parent expanded --}}
+            <a class="{{ Request::routeIs('admin.activity.report', 'admin.activity.status', 'admin.activity.solved') ? 'active' : '' }}">
+              <span class="nav-caret">
+                <i class="fa fa-caret-down"></i>
+              </span>
+              <span class="nav-label">
+                <b class="label rounded label-sm primary" id="activity-sap-count">0</b>
+              </span>
+              <span class="nav-icon">
+                <i class="material-icons">&#xe5c3;
+                  <span ui-include="'{{ asset('layouts/assets/images/i_1.svg') }}'"></span>
+                </i>
+              </span>
+              <span class="nav-text">Activity SAP</span>
+            </a>
+            <ul class="nav-sub">
+              <li>
+                <a href="{{ route('admin.activity.report') }}" class="{{ Request::routeIs('admin.activity.report') ? 'active' : '' }}">
+                  Activity Report
+                  <b class="label rounded label-xs primary ml-2" id="activity-sap-sub-count">0</b>
+                </a>
+              </li>
+              <li>
+                <a href="{{ route('admin.activity.status') }}" class="{{ Request::routeIs('admin.activity.status') ? 'active' : '' }}">
+                  Activity Status
+                  <b class="label rounded label-xs warning ml-2" id="activity-status-sub-count">0</b>
+                </a>
+              </li>
+              <li>
+                <a href="{{ route('admin.activity.solved') }}" class="{{ Request::routeIs('admin.activity.solved') ? 'active' : '' }}">
+                  Activity Solved
+                  <b class="label rounded label-xs success ml-2" id="activity-solved-sub-count">0</b>
+                </a>
+              </li>
 
               </ul>
-            </li>
+          </li>
+
 
             <li>
               {{-- Check if any sub-item is active to keep the parent expanded --}}
@@ -62,7 +78,7 @@
                   <i class="fa fa-caret-down"></i>
                 </span>
                 <span class="nav-label">
-                  <b class="label rounded label-sm primary">3</b>
+                  
                 </span>
                 <span class="nav-icon">
                   <i class="material-icons">&#xe8b8;
@@ -109,14 +125,23 @@
             </a>
             <div class="mb-0 h5 no-wrap" ng-bind="$state.current.data.title" id="pageTitle"></div>
 
-            <ul class="nav navbar-nav ml-auto flex-row">
-              <li class="nav-item dropdown pos-stc-xs">
-                <a class="nav-link mr-2" href data-toggle="dropdown">
-                  <i class="material-icons">&#xe7f5;</i>
-                  <span class="label label-sm up warn">3</span>
+
+            <ul class="white nav navbar-nav ml-auto flex-row">
+              <li class="nav-item dropdown pos-stc-xs" id="notif-wrapper">
+                <a class="nav-link mr-2" href="#" id="notifDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="material-icons">&#xe7f5;</i>
+                    <span class="label label-sm up warn" id="notif-count">0</span>
                 </a>
-                <div ui-include="'../views/blocks/dropdown.notification.html'"></div>
+
+                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="notifDropdown" id="notif-list" style="width: 300px;">
+                  <div class="dropdown-header">Notifikasi Baru</div>
+                  <div id="notif-items"></div>
+                </div>
               </li>
+
+
+
+
               <li class="nav-item dropdown">
                 <a class="nav-link p-0 clear" href="#" data-toggle="dropdown">
                   <span class="avatar w-32">

@@ -13,6 +13,54 @@ use Illuminate\Support\Facades\Session;
 
 class dashboardController extends Controller
 {
+   public function fetch()
+{
+    $koneksi = HanaConnection::getConnection();
+
+    // Fetch report (activity tanpa kategori)
+    $queryReport = "
+        SELECT TOP 100 ID_ACTIVITY, TIKET 
+        FROM SBO_CMNP_KK.ACTIVITY 
+        WHERE ID_KATEGORI IS NULL 
+        ORDER BY TGL_ACTIVITY DESC
+    ";
+    $report = $koneksi->query($queryReport)->fetchAll(\PDO::FETCH_ASSOC);
+
+    // Fetch status (activity tanpa status)
+    $queryStatus = "
+        SELECT TOP 100 ID_ACTIVITY, TIKET 
+        FROM SBO_CMNP_KK.ACTIVITY 
+        WHERE ID_STATUS IS NULL 
+        ORDER BY TGL_STATUS DESC
+    ";
+    $status = $koneksi->query($queryStatus)->fetchAll(\PDO::FETCH_ASSOC);
+
+    // Fetch solved (activity belum diselesaikan)
+    $querySolved = "
+        SELECT TOP 100 ID_ACTIVITY, TIKET 
+        FROM SBO_CMNP_KK.ACTIVITY 
+        WHERE TGL_SOLVED IS NULL 
+        ORDER BY ID_ACTIVITY DESC
+    ";
+    $solved = $koneksi->query($querySolved)->fetchAll(\PDO::FETCH_ASSOC);
+
+    return response()->json([
+        'report' => [
+            'count' => count($report),
+            'items' => $report
+        ],
+        'status' => [
+            'count' => count($status),
+            'items' => $status
+        ],
+        'solved' => [
+            'count' => count($solved),
+            'items' => $solved
+        ]
+    ]);
+}
+
+
 // This method is used to display the dashboard page
     public function index(Request $request)
 {
