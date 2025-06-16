@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Helpers\HanaConnection;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Session;
 
@@ -17,59 +18,60 @@ class dashboardController extends Controller
 {
     $koneksi = HanaConnection::getConnection();
 
-    // Fetch report (activity tanpa kategori)
-    $queryReport = "
-        SELECT TOP 100 ID_ACTIVITY, TIKET 
-        FROM SBO_CMNP_KK.ACTIVITY 
-        WHERE ID_KATEGORI IS NULL 
+    $reportQuery = "
+        SELECT ID_ACTIVITY, TIKET
+        FROM SBO_CMNP_KK.ACTIVITY
+        WHERE ID_KATEGORI IS NULL
         ORDER BY TGL_ACTIVITY DESC
+        LIMIT 5
     ";
-    $report = $koneksi->query($queryReport)->fetchAll(\PDO::FETCH_ASSOC);
 
-    // Fetch status (activity tanpa status)
-    $queryStatus = "
-        SELECT TOP 100 ID_ACTIVITY, TIKET 
-        FROM SBO_CMNP_KK.ACTIVITY 
-        WHERE ID_STATUS IS NULL 
+    $statusQuery = "
+        SELECT ID_ACTIVITY, TIKET
+        FROM SBO_CMNP_KK.ACTIVITY
+        WHERE ID_STATUS IS NULL
         ORDER BY TGL_STATUS DESC
+        LIMIT 5
     ";
-    $status = $koneksi->query($queryStatus)->fetchAll(\PDO::FETCH_ASSOC);
 
-    // Fetch solved (activity belum diselesaikan)
-    $querySolved = "
-        SELECT TOP 100 ID_ACTIVITY, TIKET 
-        FROM SBO_CMNP_KK.ACTIVITY 
-        WHERE TGL_SOLVED IS NULL 
-        ORDER BY ID_ACTIVITY DESC
+    $solvedQuery = "
+        SELECT ID_ACTIVITY, TIKET
+        FROM SBO_CMNP_KK.ACTIVITY
+        WHERE TGL_SOLVED IS NULL
+        ORDER BY TGL_SOLVED DESC
+        LIMIT 5
     ";
-    $solved = $koneksi->query($querySolved)->fetchAll(\PDO::FETCH_ASSOC);
+
+    $report = $koneksi->query($reportQuery)->fetchAll(\PDO::FETCH_ASSOC);
+    $status = $koneksi->query($statusQuery)->fetchAll(\PDO::FETCH_ASSOC);
+    $solved = $koneksi->query($solvedQuery)->fetchAll(\PDO::FETCH_ASSOC);
 
     return response()->json([
-        'report' => [
-            'count' => count($report),
-            'items' => $report
-        ],
-        'status' => [
-            'count' => count($status),
-            'items' => $status
-        ],
-        'solved' => [
-            'count' => count($solved),
-            'items' => $solved
-        ]
+        'report_count' => count($report),
+        'status_count' => count($status),
+        'solved_count' => count($solved),
+        'report' => $report,
+        'status' => $status,
+        'solved' => $solved,
     ]);
 }
 
 
+
+
+
+
+
 // This method is used to display the dashboard page
-    public function index(Request $request)
+   public function index(Request $request)
 {
     if (!session('admin_sap')) {
-           abort(404); // Activity not found
-        }
+        abort(404); // Activity not found
+    }
+
     $koneksi = HanaConnection::getConnection();
 
-    // Filter WHERE
+    // Filter WHERE untuk chart dan report
     $where = "WHERE 1=1";
     if ($request->bulan) {
         $where .= " AND MONTH(TGL_ACTIVITY) = " . (int) $request->bulan;
@@ -78,7 +80,9 @@ class dashboardController extends Controller
         $where .= " AND YEAR(TGL_ACTIVITY) = " . (int) $request->tahun;
     }
 
-    // Data untuk chart
+    // =======================
+    // 1. CHART PER COMPANY
+    // =======================
     $chartQuery = "
         SELECT COMPANY_SAP.NM_COMPANY, COUNT(*) AS JUMLAH 
         FROM SBO_CMNP_KK.ACTIVITY
@@ -88,17 +92,56 @@ class dashboardController extends Controller
     ";
     $dataChart = $koneksi->query($chartQuery)->fetchAll();
 
-    // Data tabel
+    // =======================
+    // 2. TABEL AKTIVITAS
+    // =======================
     $tabelQuery = "
         SELECT * 
         FROM SBO_CMNP_KK.ACTIVITY 
         LEFT JOIN SBO_CMNP_KK.COMPANY_SAP ON ACTIVITY.ID_COMPANY = COMPANY_SAP.ID_COMPANY
-        $where
     ";
     $aktivitas = $koneksi->query($tabelQuery)->fetchAll();
 
-    return view('admin.dashboardAdmin', compact('dataChart', 'aktivitas'));
+    // =======================
+    // 3. TASK REPORT: FINISHED & REMAINING
+    // =======================
+    $finishedQuery = "
+        SELECT COUNT(ID_ACTIVITY) AS JUMLAH 
+        FROM SBO_CMNP_KK.ACTIVITY 
+        WHERE TGL_KOMENTAR IS NOT NULL
+    ";
+    $finished = $koneksi->query($finishedQuery)->fetch()['JUMLAH'];
+
+    $remainingQuery = "
+        SELECT COUNT(ID_ACTIVITY) AS JUMLAH 
+        FROM SBO_CMNP_KK.ACTIVITY 
+        WHERE TGL_KOMENTAR IS NULL
+    ";
+    $remaining = $koneksi->query($remainingQuery)->fetch()['JUMLAH'];
+
+    $total = $finished + $remaining;
+    $finishedPercent = $total > 0 ? round(($finished / $total) * 100) : 0;
+    $remainingPercent = 100 - $finishedPercent;
+
+    // Kirim semua ke view
+    return view('admin.dashboardAdmin', compact(
+        'dataChart',
+        'aktivitas',
+        'finished',
+        'remaining',
+        'finishedPercent',
+        'remainingPercent'
+    ));
 }
+
+
+
+
+
+
+
+
+
 // This method is used to display the activity report page
     public function activityReport()
     {

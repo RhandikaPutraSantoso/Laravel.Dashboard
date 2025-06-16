@@ -98,34 +98,53 @@ function loadNotifications() {
     url: '{{ url("/get-notifications") }}',
     method: 'GET',
     success: function (res) {
-      // Update badge count
-      $('#notif-count').text(res.report.count)
-      $('#activity-sap-count').text(res.report.count + res.status.count + res.solved.count);
-      $('#activity-sap-sub-count').text(res.report.count);
-      $('#activity-status-sub-count').text(res.status.count);
-      $('#activity-solved-sub-count').text(res.solved.count);
+      // Update jumlah di sidebar
+      let totalCount = res.report_count + res.status_count + res.solved_count;
+      $('#notif-count').text(totalCount);
+      $('#activity-sap-count').text(totalCount);
 
-      // Optional: update dropdown dengan detail no tiket dari report
+      $('#activity-sap-sub-count').text(res.report_count);
+      $('#activity-status-sub-count').text(res.status_count);
+      $('#activity-solved-sub-count').text(res.solved_count);
+
+      // Dropdown isi
       let html = '';
-      if (res.report.items.length > 0) {
-        res.report.items.forEach(item => {
-          let routeUrl = `{{ route('admin.activity.actionreport.ubah', ':id') }}`.replace(':id', item.ID_ACTIVITY);
-          html += `<a class="dropdown-item" href="${routeUrl}"><strong>No Tiket:</strong> ${item.TIKET}</a>`;
+
+      if (res.report.length > 0) {
+        html += `<div class="dropdown-item text-primary font-weight-bold">Activity Report</div>`;
+        res.report.forEach(item => {
+          let url = `{{ route('admin.activity.actionreport.ubah', ':id') }}`.replace(':id', item.ID_ACTIVITY);
+          html += `<a class="dropdown-item" href="${url}">No Tiket: ${item.TIKET}</a>`;
         });
-      } else {
+      }
+
+      if (res.status.length > 0) {
+        html += `<div class="dropdown-item text-warning font-weight-bold mt-2">Activity Status</div>`;
+        res.status.forEach(item => {
+          let url = `{{ route('admin.activity.actionstatus.ubah',':id') }}`.replace(':id', item.ID_ACTIVITY);
+          html += `<a class="dropdown-item" href="${url}">No Tiket: ${item.TIKET}</a>`;
+        });
+      }
+
+      if (res.solved.length > 0) {
+        html += `<div class="dropdown-item text-success font-weight-bold mt-2">Activity Solved</div>`;
+        res.solved.forEach(item => {
+          let url = `{{ route('admin.activity.actionsolved.ubah',':id') }}`.replace(':id', item.ID_ACTIVITY);
+          html += `<a class="dropdown-item" href="${url}">No Tiket: ${item.TIKET}</a>`;
+        });
+      }
+
+      if (totalCount === 0) {
         html = '<div class="dropdown-item text-muted">Tidak ada notifikasi baru</div>';
       }
+
       $('#notif-items').html(html);
-    },
-    error: function () {
-      console.error("Gagal memuat notifikasi.");
     }
   });
 }
-
 loadNotifications();
-setInterval(loadNotifications, 10000);
 </script>
+
 
 
 

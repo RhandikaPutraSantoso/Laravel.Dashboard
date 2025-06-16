@@ -11,6 +11,43 @@
   <meta name="apple-mobile-web-app-title" content="Flatkit">
   <meta name="mobile-web-app-capable" content="yes">
     @include('admin.components.css')
+<style>
+   .box .col-6 {
+    padding: 10px;
+  }
+
+  .box .col-6 canvas {
+    margin: auto;
+    display: block;
+    max-width: 150px;
+    max-height: 150px;
+  }
+
+  .box .btn {
+    font-size: 11px;
+    padding: 3px 10px;
+  }
+
+  .box .mt-2 div {
+    font-size: 14px;
+  }
+
+  .box .mb-0 {
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  .box small {
+    font-size: 12px;
+  
+  }
+  .box {
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  color: 'inherit'
+}
+
+</style>
 
 </head>
 <body>
@@ -51,6 +88,38 @@
     <div style="text-align:center; margin-top:10px;">
         <button id="resetChartBtn" class="btn btn-secondary" style="display: none;">Reset Chart</button>
     </div>
+
+   <!--Task Report-->
+<div class="box white">
+    <div class="box-header white d-flex justify-content-between align-items-center">
+        <div>
+            <h3 class="mb-0">Tasks</h3>
+            <small>Calculated in last 7 days</small>
+        </div>
+        <div class="d-flex gap-2 align-items-center">
+            <i class="material-icons">refresh</i>
+            <i class="material-icons">more_vert</i>
+        </div>
+    </div>
+    <div class="row no-gutters text-center" style="padding: 20px 0;">
+        <div class="col-6 white">
+            <canvas id="finishedChart" width="120" height="120"></canvas>
+            <div class="mt-2">
+                <strong>Finished</strong>
+                <div>{{ $finished }}</div>
+            </div>
+        </div>
+        <div class="col-6 white">
+            <canvas id="remainingChart" width="120" height="120"></canvas>
+            <div class="mt-2">
+                <strong>Remaining</strong>
+                <div>{{ $remaining }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 
     <!-- Tabel -->
     <br><br>
@@ -177,6 +246,71 @@
         resetBtn.style.display = 'none';
     });
 </script>
+
+
+<script>
+    // Plugin untuk menampilkan persen di tengah chart
+    const centerTextPlugin = {
+        id: 'centerText',
+        beforeDraw(chart) {
+            const { width, height } = chart;
+            const ctx = chart.ctx;
+            const dataset = chart.data.datasets[0].data;
+            const total = dataset.reduce((a, b) => a + b, 0);
+            const percent = Math.round((dataset[0] / total) * 100) + '%';
+
+            ctx.save();
+            ctx.font = 'bold 18px sans-serif';
+            ctx.fillStyle = '#000';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(percent, width / 2, height / 2);
+            ctx.restore();
+        }
+    };
+
+    // Registrasi plugin
+    Chart.register(centerTextPlugin);
+
+    // Opsi chart umum
+    const chartOptions = {
+        cutout: '70%',
+        plugins: {
+            tooltip: { enabled: false },
+            legend: { display: false }
+        }
+    };
+
+    // Chart Finished
+    new Chart(document.getElementById('finishedChart'), {
+        type: 'doughnut',
+        data: {
+            datasets: [{
+                data: [{{ $finishedPercent }}, 100 - {{ $finishedPercent }}],
+                backgroundColor: ['#1abc9c', '#eeeeee'],
+                borderWidth: 7
+            }]
+        },
+        options: chartOptions,
+        plugins: [centerTextPlugin]
+    });
+
+    // Chart Remaining
+    new Chart(document.getElementById('remainingChart'), {
+        type: 'doughnut',
+        data: {
+            datasets: [{
+                data: [{{ $remainingPercent }}, 100 - {{ $remainingPercent }}],
+                backgroundColor: ['#f1c40f', '#eeeeee'],
+                borderWidth: 7
+            }]
+        },
+        options: chartOptions,
+        plugins: [centerTextPlugin]
+    });
+</script>
+
+
 @include('admin.components.scripts')
 
 @include('admin.components.themes')

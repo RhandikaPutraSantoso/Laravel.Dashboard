@@ -268,7 +268,7 @@ sup {
 
 .dropdown-menu {
   font-size: 0.875rem;
-  color: rgba(0, 0, 0, 0.87);
+  color: inherit;
   border-radius: 3px;
   border: 1px solid rgba(0, 0, 0, 0.1);
   -webkit-transform-origin: top left;
@@ -2892,6 +2892,7 @@ div.input-group > .select2-container > .selection {
   background-color: #f8f8f8; }
 
 .white {
+  
   background-color: #fff; }
 
 .dark-white {

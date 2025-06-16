@@ -4,8 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\dashboardController;
 use App\Http\Controllers\userController;
 use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
-//log-viewers
-Route::get('log-viewers', [\Rap2hpoutre\LaravelLogViewer\LogViewerController::class, 'index']);
+
 
 Route::get('/', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.post');
@@ -16,7 +15,11 @@ Route::get('/admin/dashboardAdmin', [DashboardController::class, 'index'])->midd
 
 // Grouped protected routes
 Route::middleware('checklogin')->group(callback: function () {
+    //log-viewers
+    Route::get('log-viewers', [\Rap2hpoutre\LaravelLogViewer\LogViewerController::class, 'index']);
     Route::get('/get-notifications', [App\Http\Controllers\dashboardController::class, 'fetch']);
+
+    
 
     Route::get('/admin/activity/report', [DashboardController::class, 'activityReport'])->name('admin.activity.report');
     Route::get('/admin/activity/berita-acara/{id}', [DashboardController::class, 'cetakBeritaAcara'])->name('admin.activity.berita_acara_pdf');

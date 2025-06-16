@@ -1,3 +1,6 @@
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-barstyle" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
   <link rel="shortcut icon" sizes="196x196" href="{{ asset('layouts/assets/images/logo2.png') }}">
   <link rel="apple-touch-icon" href="{{ asset('layouts/assets/images/logo2.png') }}">
   <!-- style -->
@@ -11,6 +14,6 @@
   <link rel="stylesheet" href="{{ asset('layouts/assets/styles/app.css') }}" type="text/css" />
   <!-- endbuild -->
   <link rel="stylesheet" href="{{ asset('layouts/assets/styles/font.css') }}" type="text/css" />
-  <link rel="stylesheet" href="{{ asset('layouts/assets/DataTables/DataTables-1.10.18/css/dataTables.bootstrap4.min.css') }}" type="text/css" />
+  
 
   

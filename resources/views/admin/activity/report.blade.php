@@ -26,7 +26,7 @@
                 <a href="{{ route('admin.activity.actionreport.tambah') }}" class="pull-right btn btn-primary mb-3"> + ADD ACTIVITY</a>
                 <h2>Aktivitas Perusahaan</h2>
             </div>
-            <div class="table-responsive" data-target="bg">
+            <div class="table-responsive">
                 <table id="table" class="table table-striped b-t b-b dataTable no-footer display-inline">
                     <thead >
                         
