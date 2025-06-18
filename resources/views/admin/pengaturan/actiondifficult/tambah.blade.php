@@ -35,8 +35,8 @@
         @csrf
 
         <div class="form-group mb-3">
-            <label for="nama_kategori">Nama Difficult:</label>
-            <input type="text" name="nama_kategori" id="nama_kategori" class="form-control" required>
+            <label for="nama_DIFFICULT">Nama Difficult:</label>
+            <input type="text" name="nama_DIFFICULT" id="nama_DIFFICULT" class="form-control" required>
         </div>
 
         <button type="submit" class="btn btn-primary">Simpan</button>

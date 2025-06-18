@@ -18,9 +18,9 @@
   <!-- ############ PAGE START-->
 
   <div class="container">
-    <h2>DIFFICULT SETTINGS</h2>
+    <h2>STATUS SETTINGS</h2>
     <div class="alert alert-info">
-        <strong>Note:</strong> This page displays the difficult settings for the application.
+        <strong>Note:</strong> This page displays the status settings for the application.
     </div>
 
     <div class="padding">

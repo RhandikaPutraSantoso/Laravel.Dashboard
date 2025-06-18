@@ -42,18 +42,18 @@
             @foreach ($difficultSettings as $index => $difficult)
             <tr>
                 <td>{{ $index + 1 }}</td>
-                <td>{{ $difficult['NAMA_KATEGORI'] }}</td>
+                <td>{{ $difficult['NM_DIFFICULT'] }}</td>
                 <td>
-                    <a href="#" onclick="event.preventDefault(); if(confirm('Yakin ingin menghapus?')) { document.getElementById('delete-form-{{ $difficult['ID_KATEGORI'] }}').submit(); }" class="btn btn-danger btn-sm">
+                    <a href="#" onclick="event.preventDefault(); if(confirm('Yakin ingin menghapus?')) { document.getElementById('delete-form-{{ $difficult['ID_DIFFICULT'] }}').submit(); }" class="btn btn-danger btn-sm">
     <i class="glyphicon glyphicon-trash"></i> Hapus
 </a>
 
-<form id="delete-form-{{ $difficult['ID_KATEGORI'] }}" action="{{ route('admin.pengaturan.difficult.destroy', $difficult['ID_KATEGORI']) }}" method="POST" style="display: none;">
+<form id="delete-form-{{ $difficult['ID_DIFFICULT'] }}" action="{{ route('admin.pengaturan.difficult.destroy', $difficult['ID_DIFFICULT']) }}" method="POST" style="display: none;">
     @csrf
     @method('DELETE')
 </form>
 
-                    <a href="{{ route('admin.pengaturan.actiondifficult.ubah', $difficult['ID_KATEGORI']) }}" class="btn btn-warning btn-sm">Ubah</a>
+                    <a href="{{ route('admin.pengaturan.actiondifficult.ubah', $difficult['ID_DIFFICULT']) }}" class="btn btn-warning btn-sm">Ubah</a>
                 </td>
             </tr>
             @endforeach

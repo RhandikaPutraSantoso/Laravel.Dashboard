@@ -101,16 +101,16 @@
       </div>
 
       <div class="form-group">
-        <label>Nama Kategori</label>
-        <select class="form-control" name="ID_KATEGORI" required>
-          <option value="">Pilih Kategori</option>
-          @foreach ($datakategori as $value)
-            <option value="{{ $value['ID_KATEGORI'] }}" {{ $activity['ID_KATEGORI'] == $value['ID_KATEGORI'] ? 'selected' : '' }}>
-              {{ $value['NAMA_KATEGORI'] }}
+        <label>Nama DIFFICULT</label>
+        <select class="form-control" name="ID_DIFFICULT" required>
+          <option value="">Pilih DIFFICULT</option>
+          @foreach ($dataDIFFICULT as $value)
+            <option value="{{ $value['ID_DIFFICULT'] }}" {{ $activity['ID_DIFFICULT'] == $value['ID_DIFFICULT'] ? 'selected' : '' }}>
+              {{ $value['NM_DIFFICULT'] }}
             </option>
           @endforeach
         </select>
-        @error('ID_KATEGORI')
+        @error('ID_DIFFICULT')
           <small class="text-danger">{{ $message }}</small>
         @enderror
       </div>

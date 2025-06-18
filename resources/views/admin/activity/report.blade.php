@@ -42,7 +42,7 @@
                             <th>Tanggal Terkirim</th>
                             <th>Komentar</th>
                             <th>Tanggal Komentar</th>
-                            <th>Kategori</th>
+                            <th></th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -66,7 +66,7 @@
                             <td>{{ $activity['TGL_ACTIVITY'] }}</td>
                             <td>{!! nl2br(e($activity['KOMENTAR'])) !!}</td>
                             <td>{{ $activity['TGL_KOMENTAR'] }}</td>
-                            <td>{{ $activity['NAMA_KATEGORI'] }}</td>
+                            <td>{{ $activity['NM_DIFFICULT'] }}</td>
                             <td>
                                 <div class="btn-group-vertical">
                                     <a href="{{ route('admin.activity.actionreport.detail', ['id' => $activity['ID_ACTIVITY']]) }}" class="btn btn-info btn-sm">

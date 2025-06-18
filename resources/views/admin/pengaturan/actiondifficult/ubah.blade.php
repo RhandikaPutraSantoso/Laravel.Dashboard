@@ -32,13 +32,13 @@
                 <h3>Form Ubah Email</h3>
             </div>
             <div class="box-body">
-                <form action="{{ route('admin.pengaturan.actiondifficult.update', $difficult['ID_KATEGORI']) }}" method="POST">
+                <form action="{{ route('admin.pengaturan.actiondifficult.update', $difficult['ID_DIFFICULT']) }}" method="POST">
                     @csrf
                     @method('PUT')
 
                     <div class="form-group">
-                        <label for="nama_kategori">Nama Difficult</label>
-                        <input type="text" name="nama_kategori" id="nama_kategori" class="form-control" value="{{ old('nama_kategori', $difficult['NAMA_KATEGORI']) }}" required>
+                        <label for="nama_DIFFICULT">Nama Difficult</label>
+                        <input type="text" name="nama_DIFFICULT" id="nama_DIFFICULT" class="form-control" value="{{ old('nama_DIFFICULT', $difficult['NM_DIFFICULT']) }}" required>
                     </div>
 
                     <button type="submit" class="btn btn-success">Simpan Perubahan</button>

@@ -51,8 +51,8 @@ class AuthController extends Controller
 
             // Buat query SQL berdasarkan tipe login
             $sql = $type === 'admin'
-                ? "SELECT * FROM SBO_CMNP_KK.ADMIN_SAP WHERE USERNAME = '$username' AND PASSWORD = '$password' LIMIT 1"
-                : "SELECT * FROM SBO_CMNP_KK.USER_SAP WHERE USERNAME = '$username' AND PASSWORD = '$password' AND EMAIL = '$email' AND NM_COMPANY = '$company' LIMIT 1";
+                ? "SELECT * FROM SBO_SUPPORT_SAPHANA.ADMIN_SAP WHERE USERNAME = '$username' AND PASSWORD = '$password' LIMIT 1"
+                : "SELECT * FROM SBO_SUPPORT_SAPHANA.USER_SAP WHERE USERNAME = '$username' AND PASSWORD = '$password' AND EMAIL = '$email' AND NM_COMPANY = '$company' LIMIT 1";
 
             // Jalankan query
             $stmt = $koneksi->query($sql);

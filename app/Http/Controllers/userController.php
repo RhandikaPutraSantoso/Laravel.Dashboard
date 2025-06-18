@@ -6,6 +6,7 @@ use App\Helpers\HanaConnection;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
+use Termwind\Components\Dd;
 
 
 
@@ -36,8 +37,8 @@ class userController extends Controller
     // Data untuk chart
     $chartQuery = "
         SELECT COMPANY_SAP.NM_COMPANY, COUNT(*) AS JUMLAH 
-        FROM SBO_CMNP_KK.ACTIVITY
-        LEFT JOIN SBO_CMNP_KK.COMPANY_SAP ON ACTIVITY.ID_COMPANY = COMPANY_SAP.ID_COMPANY
+        FROM SBO_SUPPORT_SAPHANA.ACTIVITY
+        LEFT JOIN SBO_SUPPORT_SAPHANA.COMPANY_SAP ON ACTIVITY.ID_COMPANY = COMPANY_SAP.ID_COMPANY
         $where 
         GROUP BY COMPANY_SAP.NM_COMPANY
     ";
@@ -46,8 +47,8 @@ class userController extends Controller
     // Data tabel
     $tabelQuery = "
         SELECT * 
-        FROM SBO_CMNP_KK.ACTIVITY 
-        LEFT JOIN SBO_CMNP_KK.COMPANY_SAP ON ACTIVITY.ID_COMPANY = COMPANY_SAP.ID_COMPANY
+        FROM SBO_SUPPORT_SAPHANA.ACTIVITY 
+        LEFT JOIN SBO_SUPPORT_SAPHANA.COMPANY_SAP ON ACTIVITY.ID_COMPANY = COMPANY_SAP.ID_COMPANY
         $where
     ";
     $aktivitas = $koneksi->query($tabelQuery)->fetchAll();
@@ -64,15 +65,15 @@ class userController extends Controller
         
         $username= session::get( 'user_sap' ) ;
 
-      $sql = " SELECT ACTIVITY.*, COMPANY_SAP.NM_COMPANY FROM SBO_CMNP_KK.ACTIVITY 
-        LEFT JOIN SBO_CMNP_KK.COMPANY_SAP ON ACTIVITY.ID_COMPANY = COMPANY_SAP.ID_COMPANY 
+      $sql = " SELECT ACTIVITY.*, COMPANY_SAP.NM_COMPANY FROM SBO_SUPPORT_SAPHANA.ACTIVITY 
+        LEFT JOIN SBO_SUPPORT_SAPHANA.COMPANY_SAP ON ACTIVITY.ID_COMPANY = COMPANY_SAP.ID_COMPANY 
         WHERE ACTIVITY.NM_USER = '$username' "; 
         $activities = $koneksi->query($sql)->fetchAll(\PDO::FETCH_ASSOC);
 
         // Ambil foto pertama untuk setiap aktivitas
         foreach ($activities as &$activity) {
             $id = $activity['ID_ACTIVITY'];
-            $fotoQuery = $koneksi->query("SELECT NM_ACTIVITY_FOTO FROM SBO_CMNP_KK.ACTIVITY_FOTO WHERE ID_ACTIVITY = '$id' LIMIT 1");
+            $fotoQuery = $koneksi->query("SELECT NM_ACTIVITY_FOTO FROM SBO_SUPPORT_SAPHANA.ACTIVITY_FOTO WHERE ID_ACTIVITY = '$id' LIMIT 1");
             $foto = $fotoQuery->fetch(\PDO::FETCH_ASSOC);
             $activity['FOTO'] = $foto['NM_ACTIVITY_FOTO'] ?? null;
         }
@@ -91,8 +92,8 @@ class userController extends Controller
                 $companyName = Session::get('company');
                 $email = Session::get('email');
                 $username = Session::get('user_sap');
-                $query = $koneksi->query("SELECT * FROM SBO_CMNP_KK.COMPANY_SAP WHERE NM_COMPANY = '$companyName'");
-                $queryy = $koneksi->query("SELECT * FROM SBO_CMNP_KK.EMAIL_SAP WHERE NM_EMAIL = '$email'");
+                $query = $koneksi->query("SELECT * FROM SBO_SUPPORT_SAPHANA.COMPANY_SAP WHERE NM_COMPANY = '$companyName'");
+                $queryy = $koneksi->query("SELECT * FROM SBO_SUPPORT_SAPHANA.EMAIL_SAP WHERE NM_EMAIL = '$email'");
                 $companies = $query->fetchAll(\PDO::FETCH_ASSOC);
 
             return view('user.activity.actionreport.tambah', compact('companies', 'companyName', 'email', 'username'));
@@ -118,7 +119,7 @@ class userController extends Controller
                     ]);
 
                     // Ambil ID_ACTIVITY terakhir
-                    $stmt = $koneksi->query("SELECT MAX(ID_ACTIVITY) AS ID FROM SBO_CMNP_KK.ACTIVITY");
+                    $stmt = $koneksi->query("SELECT MAX(ID_ACTIVITY) AS ID FROM SBO_SUPPORT_SAPHANA.ACTIVITY");
                     $last = $stmt->fetch(\PDO::FETCH_ASSOC);
                     $nextId = $last['ID'] + 1;
 
@@ -126,7 +127,7 @@ class userController extends Controller
 
                     // Ambil nama company dari ID
                     $companyName = '';
-                    $query = $koneksi->query("SELECT * FROM SBO_CMNP_KK.COMPANY_SAP WHERE ID_COMPANY = '{$request->company}'");
+                    $query = $koneksi->query("SELECT * FROM SBO_SUPPORT_SAPHANA.COMPANY_SAP WHERE ID_COMPANY = '{$request->company}'");
                     if ($row = $query->fetch(\PDO::FETCH_ASSOC)) {
                         $companyName = $row['NM_COMPANY'];
                     }
@@ -147,7 +148,7 @@ class userController extends Controller
                     }
 
                     // Simpan aktivitas
-                    $stmt = $koneksi->prepare("INSERT INTO SBO_CMNP_KK.ACTIVITY 
+                    $stmt = $koneksi->prepare("INSERT INTO SBO_SUPPORT_SAPHANA.ACTIVITY 
                         (ID_ACTIVITY, ID_COMPANY, MAIL_COMPANY, NM_USER, SUBJECT, DESKRIPSI, ID_ACTIVITY_FOTO, TGL_ACTIVITY, TIKET)
                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
@@ -165,11 +166,11 @@ class userController extends Controller
 
                     // Simpan ke tabel foto
                     foreach ($uploadedPhotos as $photoName) {
-                        $stmt = $koneksi->query("SELECT MAX(ID_ACTIVITY_FOTO) AS ID FROM SBO_CMNP_KK.ACTIVITY_FOTO");
+                        $stmt = $koneksi->query("SELECT MAX(ID_ACTIVITY_FOTO) AS ID FROM SBO_SUPPORT_SAPHANA.ACTIVITY_FOTO");
                         $last = $stmt->fetch(\PDO::FETCH_ASSOC);
                         $nextFotoId = $last['ID'] + 1;
 
-                        $koneksi->prepare("INSERT INTO SBO_CMNP_KK.ACTIVITY_FOTO (ID_ACTIVITY_FOTO, ID_ACTIVITY, NM_ACTIVITY_FOTO)
+                        $koneksi->prepare("INSERT INTO SBO_SUPPORT_SAPHANA.ACTIVITY_FOTO (ID_ACTIVITY_FOTO, ID_ACTIVITY, NM_ACTIVITY_FOTO)
                         VALUES (?, ?, ?)")->execute([
                             $nextFotoId,
                             $nextId,
@@ -192,12 +193,10 @@ class userController extends Controller
                     // Ambil detail aktivitas (query langsung)
                     $query = "
                         SELECT 
-                            ACTIVITY.*, 
-                            KATEGORI.NAMA_KATEGORI, 
+                            ACTIVITY.*,
                             COMPANY_SAP.NM_COMPANY 
-                        FROM SBO_CMNP_KK.ACTIVITY 
-                        LEFT JOIN SBO_CMNP_KK.KATEGORI ON ACTIVITY.ID_KATEGORI = KATEGORI.ID_KATEGORI
-                        LEFT JOIN SBO_CMNP_KK.COMPANY_SAP ON ACTIVITY.ID_COMPANY = COMPANY_SAP.ID_COMPANY
+                        FROM SBO_SUPPORT_SAPHANA.ACTIVITY 
+                        LEFT JOIN SBO_SUPPORT_SAPHANA.COMPANY_SAP ON ACTIVITY.ID_COMPANY = COMPANY_SAP.ID_COMPANY
                         WHERE ACTIVITY.ID_ACTIVITY = '$id'
                         AND ACTIVITY.NM_USER = '$username'
                         
@@ -209,7 +208,7 @@ class userController extends Controller
                     }
                         
                     // Ambil foto aktivitas
-                    $fotos = $koneksi->query("SELECT * FROM SBO_CMNP_KK.ACTIVITY_FOTO WHERE ID_ACTIVITY = '$id'")
+                    $fotos = $koneksi->query("SELECT * FROM SBO_SUPPORT_SAPHANA.ACTIVITY_FOTO WHERE ID_ACTIVITY = '$id'")
                                     ->fetchAll(\PDO::FETCH_ASSOC);
 
                     return view('user.activity.actionreport.detail', compact('activity', 'fotos', 'username'));
@@ -230,9 +229,9 @@ class userController extends Controller
                             ACTIVITY.*, 
                             STATUS_LEVEL.NM_STATUS, 
                             COMPANY_SAP.NM_COMPANY 
-                        FROM SBO_CMNP_KK.ACTIVITY 
-                        LEFT JOIN SBO_CMNP_KK.STATUS_LEVEL ON ACTIVITY.ID_STATUS = STATUS_LEVEL.ID_STATUS
-                        LEFT JOIN SBO_CMNP_KK.COMPANY_SAP ON ACTIVITY.ID_COMPANY = COMPANY_SAP.ID_COMPANY
+                        FROM SBO_SUPPORT_SAPHANA.ACTIVITY 
+                        LEFT JOIN SBO_SUPPORT_SAPHANA.STATUS_LEVEL ON ACTIVITY.ID_STATUS = STATUS_LEVEL.ID_STATUS
+                        LEFT JOIN SBO_SUPPORT_SAPHANA.COMPANY_SAP ON ACTIVITY.ID_COMPANY = COMPANY_SAP.ID_COMPANY
                         WHERE ACTIVITY.NM_USER = '$username' ";
 
                     $activities = $koneksi->query($sql)->fetchAll(\PDO::FETCH_ASSOC);
@@ -240,7 +239,7 @@ class userController extends Controller
                     // Ambil foto pertama untuk setiap aktivitas
                     foreach ($activities as &$activity) {
                         $id = $activity['ID_ACTIVITY'];
-                        $fotoQuery = $koneksi->query("SELECT NM_ACTIVITY_FOTO FROM SBO_CMNP_KK.ACTIVITY_FOTO WHERE ID_ACTIVITY = '$id' LIMIT 1");
+                        $fotoQuery = $koneksi->query("SELECT NM_ACTIVITY_FOTO FROM SBO_SUPPORT_SAPHANA.ACTIVITY_FOTO WHERE ID_ACTIVITY = '$id' LIMIT 1");
                         $foto = $fotoQuery->fetch(\PDO::FETCH_ASSOC);
                         $activity['FOTO'] = $foto['NM_ACTIVITY_FOTO'] ?? null;
                     }
@@ -260,9 +259,9 @@ class userController extends Controller
                         ACTIVITY.*, 
                         STATUS_LEVEL.NM_STATUS, 
                         COMPANY_SAP.NM_COMPANY 
-                    FROM SBO_CMNP_KK.ACTIVITY 
-                    LEFT JOIN SBO_CMNP_KK.STATUS_LEVEL ON ACTIVITY.ID_STATUS = STATUS_LEVEL.ID_STATUS
-                    LEFT JOIN SBO_CMNP_KK.COMPANY_SAP ON ACTIVITY.ID_COMPANY = COMPANY_SAP.ID_COMPANY
+                    FROM SBO_SUPPORT_SAPHANA.ACTIVITY 
+                    LEFT JOIN SBO_SUPPORT_SAPHANA.STATUS_LEVEL ON ACTIVITY.ID_STATUS = STATUS_LEVEL.ID_STATUS
+                    LEFT JOIN SBO_SUPPORT_SAPHANA.COMPANY_SAP ON ACTIVITY.ID_COMPANY = COMPANY_SAP.ID_COMPANY
                     WHERE ACTIVITY.ID_ACTIVITY = '$id'
                     AND ACTIVITY.NM_USER = '$username'
                 ";
@@ -273,7 +272,7 @@ class userController extends Controller
                     }
 
                 // Ambil foto aktivitas
-                $fotos = $koneksi->query("SELECT * FROM SBO_CMNP_KK.ACTIVITY_FOTO WHERE ID_ACTIVITY = '$id'")
+                $fotos = $koneksi->query("SELECT * FROM SBO_SUPPORT_SAPHANA.ACTIVITY_FOTO WHERE ID_ACTIVITY = '$id'")
                                 ->fetchAll(\PDO::FETCH_ASSOC);
 
                 return view('user.activity.actionstatus.detail', compact('activity', 'fotos','username'));
@@ -295,9 +294,9 @@ class userController extends Controller
                                     ACTIVITY.*, 
                                     STATUS_LEVEL.NM_STATUS, 
                                     COMPANY_SAP.NM_COMPANY 
-                                FROM SBO_CMNP_KK.ACTIVITY 
-                                LEFT JOIN SBO_CMNP_KK.STATUS_LEVEL ON ACTIVITY.ID_STATUS = STATUS_LEVEL.ID_STATUS
-                                LEFT JOIN SBO_CMNP_KK.COMPANY_SAP ON ACTIVITY.ID_COMPANY = COMPANY_SAP.ID_COMPANY
+                                FROM SBO_SUPPORT_SAPHANA.ACTIVITY 
+                                LEFT JOIN SBO_SUPPORT_SAPHANA.STATUS_LEVEL ON ACTIVITY.ID_STATUS = STATUS_LEVEL.ID_STATUS
+                                LEFT JOIN SBO_SUPPORT_SAPHANA.COMPANY_SAP ON ACTIVITY.ID_COMPANY = COMPANY_SAP.ID_COMPANY
                             WHERE ACTIVITY.NM_USER = '$username' ";
                             
                             $activities = $koneksi->query($sql)->fetchAll(\PDO::FETCH_ASSOC);
@@ -305,7 +304,7 @@ class userController extends Controller
                             // Ambil foto pertama untuk setiap aktivitas
                             foreach ($activities as &$activity) {
                                 $id = $activity['ID_ACTIVITY'];
-                                $fotoQuery = $koneksi->query("SELECT NM_ACTIVITY_FOTO FROM SBO_CMNP_KK.ACTIVITY_FOTO WHERE ID_ACTIVITY = '$id' LIMIT 1");
+                                $fotoQuery = $koneksi->query("SELECT NM_ACTIVITY_FOTO FROM SBO_SUPPORT_SAPHANA.ACTIVITY_FOTO WHERE ID_ACTIVITY = '$id' LIMIT 1");
                                 $foto = $fotoQuery->fetch(\PDO::FETCH_ASSOC);
                                 $activity['FOTO'] = $foto['NM_ACTIVITY_FOTO'] ?? null;
                             }
@@ -326,9 +325,9 @@ class userController extends Controller
                         ACTIVITY.*, 
                         STATUS_LEVEL.NM_STATUS, 
                         COMPANY_SAP.NM_COMPANY 
-                    FROM SBO_CMNP_KK.ACTIVITY 
-                    LEFT JOIN SBO_CMNP_KK.STATUS_LEVEL ON ACTIVITY.ID_STATUS = STATUS_LEVEL.ID_STATUS
-                    LEFT JOIN SBO_CMNP_KK.COMPANY_SAP ON ACTIVITY.ID_COMPANY = COMPANY_SAP.ID_COMPANY
+                    FROM SBO_SUPPORT_SAPHANA.ACTIVITY 
+                    LEFT JOIN SBO_SUPPORT_SAPHANA.STATUS_LEVEL ON ACTIVITY.ID_STATUS = STATUS_LEVEL.ID_STATUS
+                    LEFT JOIN SBO_SUPPORT_SAPHANA.COMPANY_SAP ON ACTIVITY.ID_COMPANY = COMPANY_SAP.ID_COMPANY
                     WHERE ACTIVITY.ID_ACTIVITY = '$id'
                     AND ACTIVITY.NM_USER = '$username'
 
@@ -341,7 +340,7 @@ class userController extends Controller
 
 
                 // Ambil foto aktivitas
-                $fotos = $koneksi->query("SELECT * FROM SBO_CMNP_KK.ACTIVITY_FOTO WHERE ID_ACTIVITY = '$id'")
+                $fotos = $koneksi->query("SELECT * FROM SBO_SUPPORT_SAPHANA.ACTIVITY_FOTO WHERE ID_ACTIVITY = '$id'")
                                 ->fetchAll(\PDO::FETCH_ASSOC);
 
                 return view('user.activity.actionsolved.detail', compact('activity', 'fotos', 'username'));

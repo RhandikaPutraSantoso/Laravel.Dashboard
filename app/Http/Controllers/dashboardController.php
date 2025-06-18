@@ -20,15 +20,15 @@ class dashboardController extends Controller
 
     $reportQuery = "
         SELECT ID_ACTIVITY, TIKET
-        FROM SBO_CMNP_KK.ACTIVITY
-        WHERE ID_KATEGORI IS NULL
+        FROM SBO_SUPPORT_SAPHANA.ACTIVITY
+        WHERE ID_DIFFICULT IS NULL
         ORDER BY TGL_ACTIVITY DESC
         LIMIT 5
     ";
 
     $statusQuery = "
         SELECT ID_ACTIVITY, TIKET
-        FROM SBO_CMNP_KK.ACTIVITY
+        FROM SBO_SUPPORT_SAPHANA.ACTIVITY
         WHERE ID_STATUS IS NULL
         ORDER BY TGL_STATUS DESC
         LIMIT 5
@@ -36,7 +36,7 @@ class dashboardController extends Controller
 
     $solvedQuery = "
         SELECT ID_ACTIVITY, TIKET
-        FROM SBO_CMNP_KK.ACTIVITY
+        FROM SBO_SUPPORT_SAPHANA.ACTIVITY
         WHERE TGL_SOLVED IS NULL
         ORDER BY TGL_SOLVED DESC
         LIMIT 5
@@ -85,8 +85,8 @@ class dashboardController extends Controller
     // =======================
     $chartQuery = "
         SELECT COMPANY_SAP.NM_COMPANY, COUNT(*) AS JUMLAH 
-        FROM SBO_CMNP_KK.ACTIVITY
-        LEFT JOIN SBO_CMNP_KK.COMPANY_SAP ON ACTIVITY.ID_COMPANY = COMPANY_SAP.ID_COMPANY
+        FROM SBO_SUPPORT_SAPHANA.ACTIVITY
+        LEFT JOIN SBO_SUPPORT_SAPHANA.COMPANY_SAP ON ACTIVITY.ID_COMPANY = COMPANY_SAP.ID_COMPANY
         $where 
         GROUP BY COMPANY_SAP.NM_COMPANY
     ";
@@ -97,8 +97,8 @@ class dashboardController extends Controller
     // =======================
     $tabelQuery = "
         SELECT * 
-        FROM SBO_CMNP_KK.ACTIVITY 
-        LEFT JOIN SBO_CMNP_KK.COMPANY_SAP ON ACTIVITY.ID_COMPANY = COMPANY_SAP.ID_COMPANY
+        FROM SBO_SUPPORT_SAPHANA.ACTIVITY 
+        LEFT JOIN SBO_SUPPORT_SAPHANA.COMPANY_SAP ON ACTIVITY.ID_COMPANY = COMPANY_SAP.ID_COMPANY
     ";
     $aktivitas = $koneksi->query($tabelQuery)->fetchAll();
 
@@ -107,14 +107,14 @@ class dashboardController extends Controller
     // =======================
     $finishedQuery = "
         SELECT COUNT(ID_ACTIVITY) AS JUMLAH 
-        FROM SBO_CMNP_KK.ACTIVITY 
+        FROM SBO_SUPPORT_SAPHANA.ACTIVITY 
         WHERE TGL_KOMENTAR IS NOT NULL
     ";
     $finished = $koneksi->query($finishedQuery)->fetch()['JUMLAH'];
 
     $remainingQuery = "
         SELECT COUNT(ID_ACTIVITY) AS JUMLAH 
-        FROM SBO_CMNP_KK.ACTIVITY 
+        FROM SBO_SUPPORT_SAPHANA.ACTIVITY 
         WHERE TGL_KOMENTAR IS NULL
     ";
     $remaining = $koneksi->query($remainingQuery)->fetch()['JUMLAH'];
@@ -154,11 +154,11 @@ class dashboardController extends Controller
         $sql = "
             SELECT 
                 ACTIVITY.*, 
-                KATEGORI.NAMA_KATEGORI, 
+                DIFFICULT_LEVEL.NM_DIFFICULT, 
                 COMPANY_SAP.NM_COMPANY 
-            FROM SBO_CMNP_KK.ACTIVITY 
-            LEFT JOIN SBO_CMNP_KK.KATEGORI ON ACTIVITY.ID_KATEGORI = KATEGORI.ID_KATEGORI
-            LEFT JOIN SBO_CMNP_KK.COMPANY_SAP ON ACTIVITY.ID_COMPANY = COMPANY_SAP.ID_COMPANY
+            FROM SBO_SUPPORT_SAPHANA.ACTIVITY 
+            LEFT JOIN SBO_SUPPORT_SAPHANA.DIFFICULT_LEVEL ON ACTIVITY.ID_DIFFICULT = DIFFICULT_LEVEL.ID_DIFFICULT
+            LEFT JOIN SBO_SUPPORT_SAPHANA.COMPANY_SAP ON ACTIVITY.ID_COMPANY = COMPANY_SAP.ID_COMPANY
         ";
 
         $activities = $koneksi->query($sql)->fetchAll(\PDO::FETCH_ASSOC);
@@ -166,7 +166,7 @@ class dashboardController extends Controller
         // Ambil foto pertama untuk setiap aktivitas
         foreach ($activities as &$activity) {
             $id = $activity['ID_ACTIVITY'];
-            $fotoQuery = $koneksi->query("SELECT NM_ACTIVITY_FOTO FROM SBO_CMNP_KK.ACTIVITY_FOTO WHERE ID_ACTIVITY = '$id' LIMIT 1");
+            $fotoQuery = $koneksi->query("SELECT NM_ACTIVITY_FOTO FROM SBO_SUPPORT_SAPHANA.ACTIVITY_FOTO WHERE ID_ACTIVITY = '$id' LIMIT 1");
             $foto = $fotoQuery->fetch(\PDO::FETCH_ASSOC);
             $activity['FOTO'] = $foto['NM_ACTIVITY_FOTO'] ?? null;
         }
@@ -191,10 +191,10 @@ class dashboardController extends Controller
         SELECT 
             A.*, 
             C.NM_COMPANY,
-            K.NAMA_KATEGORI 
-        FROM SBO_CMNP_KK.ACTIVITY A
-        LEFT JOIN SBO_CMNP_KK.COMPANY_SAP C ON A.ID_COMPANY = C.ID_COMPANY
-        LEFT JOIN SBO_CMNP_KK.KATEGORI K ON A.ID_KATEGORI = K.ID_KATEGORI
+            K.NM_DIFFICULT 
+        FROM SBO_SUPPORT_SAPHANA.ACTIVITY A
+        LEFT JOIN SBO_SUPPORT_SAPHANA.COMPANY_SAP C ON A.ID_COMPANY = C.ID_COMPANY
+        LEFT JOIN SBO_SUPPORT_SAPHANA.DIFFICULT_LEVEL K ON A.ID_DIFFICULT = K.ID_DIFFICULT
         WHERE A.ID_ACTIVITY = '$id'
     ";
 
@@ -205,12 +205,12 @@ class dashboardController extends Controller
     }
 
     // Ambil satu foto pertama
-    $foto = $koneksi->query("SELECT NM_ACTIVITY_FOTO FROM SBO_CMNP_KK.ACTIVITY_FOTO WHERE ID_ACTIVITY = '$id' LIMIT 1")
+    $foto = $koneksi->query("SELECT NM_ACTIVITY_FOTO FROM SBO_SUPPORT_SAPHANA.ACTIVITY_FOTO WHERE ID_ACTIVITY = '$id' LIMIT 1")
                    ->fetch(\PDO::FETCH_ASSOC);
     $activity['FOTO'] = $foto['NM_ACTIVITY_FOTO'] ?? null;
 
     // Ambil semua foto
-    $fotos = $koneksi->query("SELECT * FROM SBO_CMNP_KK.ACTIVITY_FOTO WHERE ID_ACTIVITY = '$id'")->fetchAll(\PDO::FETCH_ASSOC);
+    $fotos = $koneksi->query("SELECT * FROM SBO_SUPPORT_SAPHANA.ACTIVITY_FOTO WHERE ID_ACTIVITY = '$id'")->fetchAll(\PDO::FETCH_ASSOC);
 
     // Peta logo berdasarkan nama perusahaan
     $logoMap = [
@@ -295,12 +295,12 @@ class dashboardController extends Controller
             
 
             // Ambil nama file foto utama
-            $ambil_activity = $koneksi->query("SELECT ID_ACTIVITY_FOTO FROM SBO_CMNP_KK.ACTIVITY WHERE ID_ACTIVITY='$id'");
+            $ambil_activity = $koneksi->query("SELECT ID_ACTIVITY_FOTO FROM SBO_SUPPORT_SAPHANA.ACTIVITY WHERE ID_ACTIVITY='$id'");
             $pecah_activity = $ambil_activity->fetch(\PDO::FETCH_ASSOC);
             $fotoUtama = $pecah_activity['ID_ACTIVITY_FOTO'] ?? null;
 
             // Ambil semua foto tambahan
-            $ambil_foto_tambahan = $koneksi->query("SELECT NM_ACTIVITY_FOTO FROM SBO_CMNP_KK.ACTIVITY_FOTO WHERE ID_ACTIVITY='$id'");
+            $ambil_foto_tambahan = $koneksi->query("SELECT NM_ACTIVITY_FOTO FROM SBO_SUPPORT_SAPHANA.ACTIVITY_FOTO WHERE ID_ACTIVITY='$id'");
             $fotoTambahan = $ambil_foto_tambahan->fetchAll(\PDO::FETCH_COLUMN);
 
             // Hapus file dari storage
@@ -320,8 +320,8 @@ class dashboardController extends Controller
             }
 
             // Hapus data dari database
-            $koneksi->query("DELETE FROM SBO_CMNP_KK.ACTIVITY_FOTO WHERE ID_ACTIVITY='$id'");
-            $hapus = $koneksi->query("DELETE FROM SBO_CMNP_KK.ACTIVITY WHERE ID_ACTIVITY='$id'");
+            $koneksi->query("DELETE FROM SBO_SUPPORT_SAPHANA.ACTIVITY_FOTO WHERE ID_ACTIVITY='$id'");
+            $hapus = $koneksi->query("DELETE FROM SBO_SUPPORT_SAPHANA.ACTIVITY WHERE ID_ACTIVITY='$id'");
 
             if ($hapus) {
                 return redirect()->route('admin.activity.report')->with('success', 'Activity dan foto berhasil dihapus.');
@@ -340,10 +340,10 @@ class dashboardController extends Controller
            abort(404); // Activity not found
         }
                 $koneksi = HanaConnection::getConnection();
-            $datakategori = $koneksi->query("SELECT * FROM SBO_CMNP_KK.KATEGORI")->fetchAll(\PDO::FETCH_ASSOC);
-            $datacompany = $koneksi->query("SELECT * FROM SBO_CMNP_KK.COMPANY_SAP")->fetchAll(\PDO::FETCH_ASSOC);
+            $dataDIFFICULT = $koneksi->query("SELECT * FROM SBO_SUPPORT_SAPHANA.DIFFICULT_LEVEL")->fetchAll(\PDO::FETCH_ASSOC);
+            $datacompany = $koneksi->query("SELECT * FROM SBO_SUPPORT_SAPHANA.COMPANY_SAP")->fetchAll(\PDO::FETCH_ASSOC);
 
-            return view('admin.activity.actionreport.tambah', compact('datakategori', 'datacompany'));
+            return view('admin.activity.actionreport.tambah', compact('dataDIFFICULT', 'datacompany'));
             }
 // This method is used to store a new activity report
             public function activityStore(Request $request)
@@ -358,7 +358,7 @@ class dashboardController extends Controller
                     'username' => 'required',
                     'Subject' => 'required|max:255',
                     'deskripsi' => 'required',
-                    'ID_KATEGORI' => 'required|numeric',
+                    'ID_DIFFICULT' => 'required|numeric',
                     'foto.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
                 ]);
 
@@ -367,7 +367,7 @@ class dashboardController extends Controller
                 $TGL_ACTIVITY = date("Y-m-d H:i:s");
 
                 // Ambil ID terakhir
-                $stmt = $koneksi->query("SELECT MAX(ID_ACTIVITY) AS ID FROM SBO_CMNP_KK.ACTIVITY");
+                $stmt = $koneksi->query("SELECT MAX(ID_ACTIVITY) AS ID FROM SBO_SUPPORT_SAPHANA.ACTIVITY");
                 $row = $stmt->fetch(\PDO::FETCH_ASSOC);
                 $nextId = $row['ID'] + 1;
 
@@ -387,8 +387,8 @@ class dashboardController extends Controller
                 }
 
                 // Simpan activity utama
-                $stmt = $koneksi->prepare("INSERT INTO SBO_CMNP_KK.ACTIVITY 
-                    (ID_ACTIVITY, ID_COMPANY, MAIL_COMPANY, NM_USER, SUBJECT, DESKRIPSI, ID_ACTIVITY_FOTO, ID_KATEGORI, TGL_ACTIVITY)
+                $stmt = $koneksi->prepare("INSERT INTO SBO_SUPPORT_SAPHANA.ACTIVITY 
+                    (ID_ACTIVITY, ID_COMPANY, MAIL_COMPANY, NM_USER, SUBJECT, DESKRIPSI, ID_ACTIVITY_FOTO, ID_DIFFICULT, TGL_ACTIVITY)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
                 $stmt->execute([
                     $nextId,
@@ -398,17 +398,17 @@ class dashboardController extends Controller
                     $request->Subject,
                     $request->deskripsi,
                     $mainFotoName,
-                    $request->ID_KATEGORI,
+                    $request->ID_DIFFICULT,
                     $TGL_ACTIVITY
                 ]);
 
                 // Simpan semua foto ke tabel ACTIVITY_FOTO
                 foreach ($fotoNames as $fotoName) {
-                    $stmt = $koneksi->query("SELECT MAX(ID_ACTIVITY_FOTO) AS ID FROM SBO_CMNP_KK.ACTIVITY_FOTO");
+                    $stmt = $koneksi->query("SELECT MAX(ID_ACTIVITY_FOTO) AS ID FROM SBO_SUPPORT_SAPHANA.ACTIVITY_FOTO");
                     $row = $stmt->fetch(\PDO::FETCH_ASSOC);
                     $nextFotoId = $row['ID'] + 1;
 
-                    $koneksi->prepare("INSERT INTO SBO_CMNP_KK.ACTIVITY_FOTO(ID_ACTIVITY_FOTO, ID_ACTIVITY, NM_ACTIVITY_FOTO)
+                    $koneksi->prepare("INSERT INTO SBO_SUPPORT_SAPHANA.ACTIVITY_FOTO(ID_ACTIVITY_FOTO, ID_ACTIVITY, NM_ACTIVITY_FOTO)
                         VALUES (?, ?, ?)")
                         ->execute([$nextFotoId, $nextId, $fotoName]);
                 }
@@ -426,20 +426,20 @@ class dashboardController extends Controller
                     $koneksi = HanaConnection::getConnection();
 
                     // Fetch activity data
-                    $activity = $koneksi->query("SELECT * FROM SBO_CMNP_KK.ACTIVITY WHERE ID_ACTIVITY='$id'")->fetch(\PDO::FETCH_ASSOC);
+                    $activity = $koneksi->query("SELECT * FROM SBO_SUPPORT_SAPHANA.ACTIVITY WHERE ID_ACTIVITY='$id'")->fetch(\PDO::FETCH_ASSOC);
 
                     if (!$activity) {
                         abort(404); // Activity not found
                     }
 
                     // Fetch related photos
-                    $daftar_foto = $koneksi->query("SELECT * FROM SBO_CMNP_KK.ACTIVITY_FOTO WHERE ID_ACTIVITY='$id'")->fetchAll(\PDO::FETCH_ASSOC);
+                    $daftar_foto = $koneksi->query("SELECT * FROM SBO_SUPPORT_SAPHANA.ACTIVITY_FOTO WHERE ID_ACTIVITY='$id'")->fetchAll(\PDO::FETCH_ASSOC);
 
                     // Fetch categories and companies for dropdowns
-                    $datakategori = $koneksi->query("SELECT * FROM SBO_CMNP_KK.KATEGORI")->fetchAll(\PDO::FETCH_ASSOC);
-                    $datacompany = $koneksi->query("SELECT * FROM SBO_CMNP_KK.COMPANY_SAP")->fetchAll(\PDO::FETCH_ASSOC);
+                    $dataDIFFICULT = $koneksi->query("SELECT * FROM SBO_SUPPORT_SAPHANA.DIFFICULT_LEVEL")->fetchAll(\PDO::FETCH_ASSOC);
+                    $datacompany = $koneksi->query("SELECT * FROM SBO_SUPPORT_SAPHANA.COMPANY_SAP")->fetchAll(\PDO::FETCH_ASSOC);
 
-                    return view('admin.activity.actionreport.ubah', compact('activity', 'daftar_foto', 'datakategori', 'datacompany'));
+                    return view('admin.activity.actionreport.ubah', compact('activity', 'daftar_foto', 'dataDIFFICULT', 'datacompany'));
                 }
 
             public function activityUpdate(Request $request, $id)
@@ -453,7 +453,7 @@ class dashboardController extends Controller
                 // Handle photo deletion first if 'hapus_foto' parameter is present
                     if ($request->has('hapus_foto')) {
                 $id_foto_to_delete = $request->input('hapus_foto');
-                $ambil = $koneksi->query("SELECT NM_ACTIVITY_FOTO FROM SBO_CMNP_KK.ACTIVITY_FOTO WHERE ID_ACTIVITY_FOTO = '$id_foto_to_delete'");
+                $ambil = $koneksi->query("SELECT NM_ACTIVITY_FOTO FROM SBO_SUPPORT_SAPHANA.ACTIVITY_FOTO WHERE ID_ACTIVITY_FOTO = '$id_foto_to_delete'");
                 $foto = $ambil->fetch(\PDO::FETCH_ASSOC);
 
                 if ($foto) {
@@ -462,7 +462,7 @@ class dashboardController extends Controller
                         unlink($path);
                     }
 
-                    $stmt_delete = $koneksi->prepare("DELETE FROM SBO_CMNP_KK.ACTIVITY_FOTO WHERE ID_ACTIVITY_FOTO = ?");
+                    $stmt_delete = $koneksi->prepare("DELETE FROM SBO_SUPPORT_SAPHANA.ACTIVITY_FOTO WHERE ID_ACTIVITY_FOTO = ?");
                     $stmt_delete->execute([$id_foto_to_delete]);
                 }
 
@@ -476,7 +476,7 @@ class dashboardController extends Controller
                         'subject' => 'required|max:255',
                         'deskripsi' => 'required',
                         'komentar' => 'nullable', // Assuming komentar can be empty
-                        'ID_KATEGORI' => 'required|numeric',
+                        'ID_DIFFICULT' => 'required|numeric',
                         'foto_baru.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048' // For new photos
                     ]);
 
@@ -484,14 +484,14 @@ class dashboardController extends Controller
 
                     // Update main activity data
                     $stmt = $koneksi->prepare("
-                        UPDATE SBO_CMNP_KK.ACTIVITY SET
+                        UPDATE SBO_SUPPORT_SAPHANA.ACTIVITY SET
                             ID_COMPANY = ?,
                             MAIL_COMPANY = ?,
                             NM_USER = ?,
                             SUBJECT = ?,
                             DESKRIPSI = ?,
                             KOMENTAR = ?,
-                            ID_KATEGORI = ?,
+                            ID_DIFFICULT = ?,
                             TGL_KOMENTAR = ?
                         WHERE ID_ACTIVITY = ?
                     ");
@@ -503,7 +503,7 @@ class dashboardController extends Controller
                         $request->subject,
                         $request->deskripsi,
                         $request->komentar,
-                        $request->ID_KATEGORI,
+                        $request->ID_DIFFICULT,
                         $TGL_KOMENTAR,
                         $id
                     ]);
@@ -514,11 +514,11 @@ class dashboardController extends Controller
                             $uniqueName = uniqid('foto_', true) . '.' . $file->getClientOriginalExtension();
                             $file->storeAs('uploads', $uniqueName, 'public'); // Using Storage facade for storing
 
-                            $stmt_max_id = $koneksi->query("SELECT MAX(ID_ACTIVITY_FOTO) AS ID FROM SBO_CMNP_KK.ACTIVITY_FOTO");
+                            $stmt_max_id = $koneksi->query("SELECT MAX(ID_ACTIVITY_FOTO) AS ID FROM SBO_SUPPORT_SAPHANA.ACTIVITY_FOTO");
                             $row_max = $stmt_max_id->fetch(\PDO::FETCH_ASSOC);
                             $next_id = $row_max['ID'] + 1;
 
-                            $stmt_insert = $koneksi->prepare("INSERT INTO SBO_CMNP_KK.ACTIVITY_FOTO (ID_ACTIVITY_FOTO, ID_ACTIVITY, NM_ACTIVITY_FOTO) VALUES (?, ?, ?)");
+                            $stmt_insert = $koneksi->prepare("INSERT INTO SBO_SUPPORT_SAPHANA.ACTIVITY_FOTO (ID_ACTIVITY_FOTO, ID_ACTIVITY, NM_ACTIVITY_FOTO) VALUES (?, ?, ?)");
                             $stmt_insert->execute([$next_id, $id, $uniqueName]);
                         }
                     }
@@ -538,18 +538,18 @@ class dashboardController extends Controller
                     $query = "
                         SELECT 
                             ACTIVITY.*, 
-                            KATEGORI.NAMA_KATEGORI, 
+                            DIFFICULT_LEVEL.NM_DIFFICULT, 
                             COMPANY_SAP.NM_COMPANY 
-                        FROM SBO_CMNP_KK.ACTIVITY 
-                        LEFT JOIN SBO_CMNP_KK.KATEGORI ON ACTIVITY.ID_KATEGORI = KATEGORI.ID_KATEGORI
-                        LEFT JOIN SBO_CMNP_KK.COMPANY_SAP ON ACTIVITY.ID_COMPANY = COMPANY_SAP.ID_COMPANY
+                        FROM SBO_SUPPORT_SAPHANA.ACTIVITY 
+                        LEFT JOIN SBO_SUPPORT_SAPHANA.DIFFICULT_LEVEL ON ACTIVITY.ID_DIFFICULT = DIFFICULT_LEVEL.ID_DIFFICULT
+                        LEFT JOIN SBO_SUPPORT_SAPHANA.COMPANY_SAP ON ACTIVITY.ID_COMPANY = COMPANY_SAP.ID_COMPANY
                         WHERE ACTIVITY.ID_ACTIVITY = '$id'
                     ";
 
                     $activity = $koneksi->query($query)->fetch(\PDO::FETCH_ASSOC);
 
                     // Ambil foto aktivitas
-                    $fotos = $koneksi->query("SELECT * FROM SBO_CMNP_KK.ACTIVITY_FOTO WHERE ID_ACTIVITY = '$id'")
+                    $fotos = $koneksi->query("SELECT * FROM SBO_SUPPORT_SAPHANA.ACTIVITY_FOTO WHERE ID_ACTIVITY = '$id'")
                                     ->fetchAll(\PDO::FETCH_ASSOC);
 
                     return view('admin.activity.actionreport.detail', compact('activity', 'fotos'));
@@ -570,9 +570,9 @@ class dashboardController extends Controller
                             ACTIVITY.*, 
                             STATUS_LEVEL.NM_STATUS, 
                             COMPANY_SAP.NM_COMPANY 
-                        FROM SBO_CMNP_KK.ACTIVITY 
-                        LEFT JOIN SBO_CMNP_KK.STATUS_LEVEL ON ACTIVITY.ID_STATUS = STATUS_LEVEL.ID_STATUS
-                        LEFT JOIN SBO_CMNP_KK.COMPANY_SAP ON ACTIVITY.ID_COMPANY = COMPANY_SAP.ID_COMPANY
+                        FROM SBO_SUPPORT_SAPHANA.ACTIVITY 
+                        LEFT JOIN SBO_SUPPORT_SAPHANA.STATUS_LEVEL ON ACTIVITY.ID_STATUS = STATUS_LEVEL.ID_STATUS
+                        LEFT JOIN SBO_SUPPORT_SAPHANA.COMPANY_SAP ON ACTIVITY.ID_COMPANY = COMPANY_SAP.ID_COMPANY
                     ";
 
                     $activities = $koneksi->query($sql)->fetchAll(\PDO::FETCH_ASSOC);
@@ -580,7 +580,7 @@ class dashboardController extends Controller
                     // Ambil foto pertama untuk setiap aktivitas
                     foreach ($activities as &$activity) {
                         $id = $activity['ID_ACTIVITY'];
-                        $fotoQuery = $koneksi->query("SELECT NM_ACTIVITY_FOTO FROM SBO_CMNP_KK.ACTIVITY_FOTO WHERE ID_ACTIVITY = '$id' LIMIT 1");
+                        $fotoQuery = $koneksi->query("SELECT NM_ACTIVITY_FOTO FROM SBO_SUPPORT_SAPHANA.ACTIVITY_FOTO WHERE ID_ACTIVITY = '$id' LIMIT 1");
                         $foto = $fotoQuery->fetch(\PDO::FETCH_ASSOC);
                         $activity['FOTO'] = $foto['NM_ACTIVITY_FOTO'] ?? null;
                     }
@@ -601,16 +601,16 @@ class dashboardController extends Controller
                         ACTIVITY.*, 
                         STATUS_LEVEL.NM_STATUS, 
                         COMPANY_SAP.NM_COMPANY 
-                    FROM SBO_CMNP_KK.ACTIVITY 
-                    LEFT JOIN SBO_CMNP_KK.STATUS_LEVEL ON ACTIVITY.ID_STATUS = STATUS_LEVEL.ID_STATUS
-                    LEFT JOIN SBO_CMNP_KK.COMPANY_SAP ON ACTIVITY.ID_COMPANY = COMPANY_SAP.ID_COMPANY
+                    FROM SBO_SUPPORT_SAPHANA.ACTIVITY 
+                    LEFT JOIN SBO_SUPPORT_SAPHANA.STATUS_LEVEL ON ACTIVITY.ID_STATUS = STATUS_LEVEL.ID_STATUS
+                    LEFT JOIN SBO_SUPPORT_SAPHANA.COMPANY_SAP ON ACTIVITY.ID_COMPANY = COMPANY_SAP.ID_COMPANY
                     WHERE ACTIVITY.ID_ACTIVITY = '$id'
                 ";
 
                 $activity = $koneksi->query($query)->fetch(\PDO::FETCH_ASSOC);
 
                 // Ambil foto aktivitas
-                $fotos = $koneksi->query("SELECT * FROM SBO_CMNP_KK.ACTIVITY_FOTO WHERE ID_ACTIVITY = '$id'")
+                $fotos = $koneksi->query("SELECT * FROM SBO_SUPPORT_SAPHANA.ACTIVITY_FOTO WHERE ID_ACTIVITY = '$id'")
                                 ->fetchAll(\PDO::FETCH_ASSOC);
 
                 return view('admin.activity.actionstatus.detail', compact('activity', 'fotos'));
@@ -625,18 +625,18 @@ class dashboardController extends Controller
                     $koneksi = HanaConnection::getConnection();
 
                     // Fetch activity data
-                    $activity = $koneksi->query("SELECT * FROM SBO_CMNP_KK.ACTIVITY WHERE ID_ACTIVITY='$id'")->fetch(\PDO::FETCH_ASSOC);
+                    $activity = $koneksi->query("SELECT * FROM SBO_SUPPORT_SAPHANA.ACTIVITY WHERE ID_ACTIVITY='$id'")->fetch(\PDO::FETCH_ASSOC);
 
                     if (!$activity) {
                         abort(404); // Activity not found
                     }
 
                     // Fetch related photos
-                    $daftar_foto = $koneksi->query("SELECT * FROM SBO_CMNP_KK.ACTIVITY_FOTO WHERE ID_ACTIVITY='$id'")->fetchAll(\PDO::FETCH_ASSOC);
+                    $daftar_foto = $koneksi->query("SELECT * FROM SBO_SUPPORT_SAPHANA.ACTIVITY_FOTO WHERE ID_ACTIVITY='$id'")->fetchAll(\PDO::FETCH_ASSOC);
 
                     // Fetch categories and companies for dropdowns
-                    $datastatus = $koneksi->query("SELECT * FROM SBO_CMNP_KK.STATUS_LEVEL")->fetchAll(\PDO::FETCH_ASSOC);
-                    $datacompany = $koneksi->query("SELECT * FROM SBO_CMNP_KK.COMPANY_SAP")->fetchAll(\PDO::FETCH_ASSOC);
+                    $datastatus = $koneksi->query("SELECT * FROM SBO_SUPPORT_SAPHANA.STATUS_LEVEL")->fetchAll(\PDO::FETCH_ASSOC);
+                    $datacompany = $koneksi->query("SELECT * FROM SBO_SUPPORT_SAPHANA.COMPANY_SAP")->fetchAll(\PDO::FETCH_ASSOC);
 
                     return view('admin.activity.actionstatus.ubah', compact('activity', 'daftar_foto', 'datastatus', 'datacompany'));
                 }
@@ -652,7 +652,7 @@ class dashboardController extends Controller
                 // Handle photo deletion first if 'hapus_foto' parameter is present
                     if ($request->has('hapus_foto')) {
                 $id_foto_to_delete = $request->input('hapus_foto');
-                $ambil = $koneksi->query("SELECT NM_ACTIVITY_FOTO FROM SBO_CMNP_KK.ACTIVITY_FOTO WHERE ID_ACTIVITY_FOTO = '$id_foto_to_delete'");
+                $ambil = $koneksi->query("SELECT NM_ACTIVITY_FOTO FROM SBO_SUPPORT_SAPHANA.ACTIVITY_FOTO WHERE ID_ACTIVITY_FOTO = '$id_foto_to_delete'");
                 $foto = $ambil->fetch(\PDO::FETCH_ASSOC);
 
                 if ($foto) {
@@ -661,7 +661,7 @@ class dashboardController extends Controller
                         unlink($path);
                     }
 
-                    $stmt_delete = $koneksi->prepare("DELETE FROM SBO_CMNP_KK.ACTIVITY_FOTO WHERE ID_ACTIVITY_FOTO = ?");
+                    $stmt_delete = $koneksi->prepare("DELETE FROM SBO_SUPPORT_SAPHANA.ACTIVITY_FOTO WHERE ID_ACTIVITY_FOTO = ?");
                     $stmt_delete->execute([$id_foto_to_delete]);
                 }
 
@@ -683,7 +683,7 @@ class dashboardController extends Controller
 
                     // Update main activity data
                     $stmt = $koneksi->prepare("
-                        UPDATE SBO_CMNP_KK.ACTIVITY SET
+                        UPDATE SBO_SUPPORT_SAPHANA.ACTIVITY SET
                             ID_COMPANY = ?,
                             MAIL_COMPANY = ?,
                             NM_USER = ?,
@@ -713,11 +713,11 @@ class dashboardController extends Controller
                             $uniqueName = uniqid('foto_', true) . '.' . $file->getClientOriginalExtension();
                             $file->storeAs('uploads', $uniqueName, 'public'); // Using Storage facade for storing
 
-                            $stmt_max_id = $koneksi->query("SELECT MAX(ID_ACTIVITY_FOTO) AS ID FROM SBO_CMNP_KK.ACTIVITY_FOTO");
+                            $stmt_max_id = $koneksi->query("SELECT MAX(ID_ACTIVITY_FOTO) AS ID FROM SBO_SUPPORT_SAPHANA.ACTIVITY_FOTO");
                             $row_max = $stmt_max_id->fetch(\PDO::FETCH_ASSOC);
                             $next_id = $row_max['ID'] + 1;
 
-                            $stmt_insert = $koneksi->prepare("INSERT INTO SBO_CMNP_KK.ACTIVITY_FOTO (ID_ACTIVITY_FOTO, ID_ACTIVITY, NM_ACTIVITY_FOTO) VALUES (?, ?, ?)");
+                            $stmt_insert = $koneksi->prepare("INSERT INTO SBO_SUPPORT_SAPHANA.ACTIVITY_FOTO (ID_ACTIVITY_FOTO, ID_ACTIVITY, NM_ACTIVITY_FOTO) VALUES (?, ?, ?)");
                             $stmt_insert->execute([$next_id, $id, $uniqueName]);
                         }
                     }
@@ -740,9 +740,9 @@ class dashboardController extends Controller
                                     ACTIVITY.*, 
                                     STATUS_LEVEL.NM_STATUS, 
                                     COMPANY_SAP.NM_COMPANY 
-                                FROM SBO_CMNP_KK.ACTIVITY 
-                                LEFT JOIN SBO_CMNP_KK.STATUS_LEVEL ON ACTIVITY.ID_STATUS = STATUS_LEVEL.ID_STATUS
-                                LEFT JOIN SBO_CMNP_KK.COMPANY_SAP ON ACTIVITY.ID_COMPANY = COMPANY_SAP.ID_COMPANY
+                                FROM SBO_SUPPORT_SAPHANA.ACTIVITY 
+                                LEFT JOIN SBO_SUPPORT_SAPHANA.STATUS_LEVEL ON ACTIVITY.ID_STATUS = STATUS_LEVEL.ID_STATUS
+                                LEFT JOIN SBO_SUPPORT_SAPHANA.COMPANY_SAP ON ACTIVITY.ID_COMPANY = COMPANY_SAP.ID_COMPANY
                             ";
 
                             $activities = $koneksi->query($sql)->fetchAll(\PDO::FETCH_ASSOC);
@@ -750,7 +750,7 @@ class dashboardController extends Controller
                             // Ambil foto pertama untuk setiap aktivitas
                             foreach ($activities as &$activity) {
                                 $id = $activity['ID_ACTIVITY'];
-                                $fotoQuery = $koneksi->query("SELECT NM_ACTIVITY_FOTO FROM SBO_CMNP_KK.ACTIVITY_FOTO WHERE ID_ACTIVITY = '$id' LIMIT 1");
+                                $fotoQuery = $koneksi->query("SELECT NM_ACTIVITY_FOTO FROM SBO_SUPPORT_SAPHANA.ACTIVITY_FOTO WHERE ID_ACTIVITY = '$id' LIMIT 1");
                                 $foto = $fotoQuery->fetch(\PDO::FETCH_ASSOC);
                                 $activity['FOTO'] = $foto['NM_ACTIVITY_FOTO'] ?? null;
                             }
@@ -772,16 +772,16 @@ class dashboardController extends Controller
                         ACTIVITY.*, 
                         STATUS_LEVEL.NM_STATUS, 
                         COMPANY_SAP.NM_COMPANY 
-                    FROM SBO_CMNP_KK.ACTIVITY 
-                    LEFT JOIN SBO_CMNP_KK.STATUS_LEVEL ON ACTIVITY.ID_STATUS = STATUS_LEVEL.ID_STATUS
-                    LEFT JOIN SBO_CMNP_KK.COMPANY_SAP ON ACTIVITY.ID_COMPANY = COMPANY_SAP.ID_COMPANY
+                    FROM SBO_SUPPORT_SAPHANA.ACTIVITY 
+                    LEFT JOIN SBO_SUPPORT_SAPHANA.STATUS_LEVEL ON ACTIVITY.ID_STATUS = STATUS_LEVEL.ID_STATUS
+                    LEFT JOIN SBO_SUPPORT_SAPHANA.COMPANY_SAP ON ACTIVITY.ID_COMPANY = COMPANY_SAP.ID_COMPANY
                     WHERE ACTIVITY.ID_ACTIVITY = '$id'
                 ";
 
                 $activity = $koneksi->query($query)->fetch(\PDO::FETCH_ASSOC);
 
                 // Ambil foto aktivitas
-                $fotos = $koneksi->query("SELECT * FROM SBO_CMNP_KK.ACTIVITY_FOTO WHERE ID_ACTIVITY = '$id'")
+                $fotos = $koneksi->query("SELECT * FROM SBO_SUPPORT_SAPHANA.ACTIVITY_FOTO WHERE ID_ACTIVITY = '$id'")
                                 ->fetchAll(\PDO::FETCH_ASSOC);
 
                 return view('admin.activity.actionsolved.detail', compact('activity', 'fotos'));
@@ -796,18 +796,18 @@ class dashboardController extends Controller
                     $koneksi = HanaConnection::getConnection();
 
                     // Fetch activity data
-                    $activity = $koneksi->query("SELECT * FROM SBO_CMNP_KK.ACTIVITY WHERE ID_ACTIVITY='$id'")->fetch(\PDO::FETCH_ASSOC);
+                    $activity = $koneksi->query("SELECT * FROM SBO_SUPPORT_SAPHANA.ACTIVITY WHERE ID_ACTIVITY='$id'")->fetch(\PDO::FETCH_ASSOC);
 
                     if (!$activity) {
                         abort(404); // Activity not found
                     }
 
                     // Fetch related photos
-                    $daftar_foto = $koneksi->query("SELECT * FROM SBO_CMNP_KK.ACTIVITY_FOTO WHERE ID_ACTIVITY='$id'")->fetchAll(\PDO::FETCH_ASSOC);
+                    $daftar_foto = $koneksi->query("SELECT * FROM SBO_SUPPORT_SAPHANA.ACTIVITY_FOTO WHERE ID_ACTIVITY='$id'")->fetchAll(\PDO::FETCH_ASSOC);
 
                     // Fetch categories and companies for dropdowns
-                    $datastatus = $koneksi->query("SELECT * FROM SBO_CMNP_KK.STATUS_LEVEL")->fetchAll(\PDO::FETCH_ASSOC);
-                    $datacompany = $koneksi->query("SELECT * FROM SBO_CMNP_KK.COMPANY_SAP")->fetchAll(\PDO::FETCH_ASSOC);
+                    $datastatus = $koneksi->query("SELECT * FROM SBO_SUPPORT_SAPHANA.STATUS_LEVEL")->fetchAll(\PDO::FETCH_ASSOC);
+                    $datacompany = $koneksi->query("SELECT * FROM SBO_SUPPORT_SAPHANA.COMPANY_SAP")->fetchAll(\PDO::FETCH_ASSOC);
 
                     return view('admin.activity.actionsolved.ubah', compact('activity', 'daftar_foto', 'datastatus', 'datacompany'));
                 }
@@ -823,7 +823,7 @@ class dashboardController extends Controller
                 // Handle photo deletion first if 'hapus_foto' parameter is present
                     if ($request->has('hapus_foto')) {
                 $id_foto_to_delete = $request->input('hapus_foto');
-                $ambil = $koneksi->query("SELECT NM_ACTIVITY_FOTO FROM SBO_CMNP_KK.ACTIVITY_FOTO WHERE ID_ACTIVITY_FOTO = '$id_foto_to_delete'");
+                $ambil = $koneksi->query("SELECT NM_ACTIVITY_FOTO FROM SBO_SUPPORT_SAPHANA.ACTIVITY_FOTO WHERE ID_ACTIVITY_FOTO = '$id_foto_to_delete'");
                 $foto = $ambil->fetch(\PDO::FETCH_ASSOC);
 
                 if ($foto) {
@@ -832,7 +832,7 @@ class dashboardController extends Controller
                         unlink($path);
                     }
 
-                    $stmt_delete = $koneksi->prepare("DELETE FROM SBO_CMNP_KK.ACTIVITY_FOTO WHERE ID_ACTIVITY_FOTO = ?");
+                    $stmt_delete = $koneksi->prepare("DELETE FROM SBO_SUPPORT_SAPHANA.ACTIVITY_FOTO WHERE ID_ACTIVITY_FOTO = ?");
                     $stmt_delete->execute([$id_foto_to_delete]);
                 }
 
@@ -854,7 +854,7 @@ class dashboardController extends Controller
 
                     // Update main activity data
                     $stmt = $koneksi->prepare("
-                        UPDATE SBO_CMNP_KK.ACTIVITY SET
+                        UPDATE SBO_SUPPORT_SAPHANA.ACTIVITY SET
                             ID_COMPANY = ?,
                             MAIL_COMPANY = ?,
                             NM_USER = ?,
@@ -884,11 +884,11 @@ class dashboardController extends Controller
                             $uniqueName = uniqid('foto_', true) . '.' . $file->getClientOriginalExtension();
                             $file->storeAs('uploads', $uniqueName, 'public'); // Using Storage facade for storing
 
-                            $stmt_max_id = $koneksi->query("SELECT MAX(ID_ACTIVITY_FOTO) AS ID FROM SBO_CMNP_KK.ACTIVITY_FOTO");
+                            $stmt_max_id = $koneksi->query("SELECT MAX(ID_ACTIVITY_FOTO) AS ID FROM SBO_SUPPORT_SAPHANA.ACTIVITY_FOTO");
                             $row_max = $stmt_max_id->fetch(\PDO::FETCH_ASSOC);
                             $next_id = $row_max['ID'] + 1;
 
-                            $stmt_insert = $koneksi->prepare("INSERT INTO SBO_CMNP_KK.ACTIVITY_FOTO (ID_ACTIVITY_FOTO, ID_ACTIVITY, NM_ACTIVITY_FOTO) VALUES (?, ?, ?)");
+                            $stmt_insert = $koneksi->prepare("INSERT INTO SBO_SUPPORT_SAPHANA.ACTIVITY_FOTO (ID_ACTIVITY_FOTO, ID_ACTIVITY, NM_ACTIVITY_FOTO) VALUES (?, ?, ?)");
                             $stmt_insert->execute([$next_id, $id, $uniqueName]);
                         }
                     }
@@ -906,7 +906,7 @@ class dashboardController extends Controller
         }
 
         $koneksi = HanaConnection::getConnection();
-        $emailSettings = $koneksi->query("SELECT * FROM SBO_CMNP_KK.EMAIL_SAP")->fetchAll(\PDO::FETCH_ASSOC);
+        $emailSettings = $koneksi->query("SELECT * FROM SBO_SUPPORT_SAPHANA.EMAIL_SAP")->fetchAll(\PDO::FETCH_ASSOC);
 
         return view('admin.pengaturan.email', compact('emailSettings'));
     }
@@ -920,7 +920,7 @@ public function emailDestroy($id)
     $koneksi = HanaConnection::getConnection();
     $id = (int) $id;
 
-    $sqlDelete = "DELETE FROM SBO_CMNP_KK.EMAIL_SAP WHERE ID_EMAIL = $id";
+    $sqlDelete = "DELETE FROM SBO_SUPPORT_SAPHANA.EMAIL_SAP WHERE ID_EMAIL = $id";
     $koneksi->exec($sqlDelete);
 
     return redirect()->route('admin.pengaturan.email')->with('success', 'Email setting deleted successfully.');
@@ -943,14 +943,14 @@ public function emailDestroy($id)
     $nm_email = addslashes($request->NM_EMAIL); // atau gunakan htmlspecialchars()
 
     // Cek duplikat
-    $sqlCek = "SELECT COUNT(*) AS JML FROM SBO_CMNP_KK.EMAIL_SAP WHERE NM_EMAIL = '$nm_email' AND ID_EMAIL != $id";
+    $sqlCek = "SELECT COUNT(*) AS JML FROM SBO_SUPPORT_SAPHANA.EMAIL_SAP WHERE NM_EMAIL = '$nm_email' AND ID_EMAIL != $id";
     $result = $koneksi->query($sqlCek)->fetch();
     if ($result['JML'] > 0) {
         return redirect()->back()->withErrors(['Email sudah digunakan.']);
     }
 
     // Update langsung pakai exec()
-    $sqlUpdate = "UPDATE SBO_CMNP_KK.EMAIL_SAP SET NM_EMAIL = '$nm_email' WHERE ID_EMAIL = $id";
+    $sqlUpdate = "UPDATE SBO_SUPPORT_SAPHANA.EMAIL_SAP SET NM_EMAIL = '$nm_email' WHERE ID_EMAIL = $id";
     $koneksi->exec($sqlUpdate);
 
     return redirect()->route('admin.pengaturan.email')->with('success', 'Email berhasil diperbarui.');
@@ -981,7 +981,7 @@ public function emailDestroy($id)
 
     // Cek duplikat email secara langsung (query biasa)
     $email = $request->email;
-    $sqlCheck = "SELECT COUNT(*) AS TOTAL FROM SBO_CMNP_KK.EMAIL_SAP WHERE NM_EMAIL = '$email'";
+    $sqlCheck = "SELECT COUNT(*) AS TOTAL FROM SBO_SUPPORT_SAPHANA.EMAIL_SAP WHERE NM_EMAIL = '$email'";
     $result = $koneksi->query($sqlCheck)->fetch(\PDO::FETCH_ASSOC);
 
     if ($result['TOTAL'] > 0) {
@@ -989,12 +989,12 @@ public function emailDestroy($id)
     }
 
     // Ambil ID_EMAIL terakhir dan tambah 1
-    $sqlMaxId = "SELECT MAX(ID_EMAIL) AS MAX_ID FROM SBO_CMNP_KK.EMAIL_SAP";
+    $sqlMaxId = "SELECT MAX(ID_EMAIL) AS MAX_ID FROM SBO_SUPPORT_SAPHANA.EMAIL_SAP";
     $resultId = $koneksi->query($sqlMaxId)->fetch(\PDO::FETCH_ASSOC);
     $nextId = (int) $resultId['MAX_ID'] + 1;
 
     // Simpan email baru
-    $sqlInsert = "INSERT INTO SBO_CMNP_KK.EMAIL_SAP (ID_EMAIL, NM_EMAIL) VALUES ($nextId, '$email')";
+    $sqlInsert = "INSERT INTO SBO_SUPPORT_SAPHANA.EMAIL_SAP (ID_EMAIL, NM_EMAIL) VALUES ($nextId, '$email')";
     $koneksi->exec($sqlInsert);
 
     return redirect()->route('admin.pengaturan.email')->with('success', 'Email added successfully.');
@@ -1012,7 +1012,7 @@ public function emailDestroy($id)
 
         $koneksi = HanaConnection::getConnection();
 
-        $query = "SELECT COUNT(*) FROM SBO_CMNP_KK.EMAIL_SAP WHERE NM_EMAIL = ?";
+        $query = "SELECT COUNT(*) FROM SBO_SUPPORT_SAPHANA.EMAIL_SAP WHERE NM_EMAIL = ?";
         $params = [$email];
 
         if ($excludeId) {
@@ -1041,7 +1041,7 @@ public function emailDestroy($id)
     }
 
     // Query langsung tanpa prepare-execute
-    $email = $koneksi->query("SELECT * FROM SBO_CMNP_KK.EMAIL_SAP WHERE ID_EMAIL = {$id}")->fetch(\PDO::FETCH_ASSOC);
+    $email = $koneksi->query("SELECT * FROM SBO_SUPPORT_SAPHANA.EMAIL_SAP WHERE ID_EMAIL = {$id}")->fetch(\PDO::FETCH_ASSOC);
 
     if (!$email) {
         abort(404); // Data tidak ditemukan
@@ -1050,23 +1050,15 @@ public function emailDestroy($id)
     return view('admin.pengaturan.actionemail.ubah', compact('email'));
 }
 
-
-
-
-
-
-
-
     public function difficult()
     {
         if (!session('admin_sap')) {
            abort(404); // Activity not found
         }
         $koneksi = HanaConnection::getConnection();
-        $difficultSettings = $koneksi->query("SELECT * FROM SBO_CMNP_KK.KATEGORI")->fetchAll(\PDO::FETCH_ASSOC);
-        if (!$difficultSettings) {
-            abort(404); // No difficult settings found
-        }
+        $difficultSettings = $koneksi->query("SELECT * FROM SBO_SUPPORT_SAPHANA.DIFFICULT_LEVEL")->fetchAll(\PDO::FETCH_ASSOC);
+        
+        
        
         return view('admin.pengaturan.difficult', compact('difficultSettings'));
     }
@@ -1080,7 +1072,7 @@ public function emailDestroy($id)
         $koneksi = HanaConnection::getConnection();
         $id = (int) $id;
 
-        $sqlDelete = "DELETE FROM SBO_CMNP_KK.KATEGORI WHERE ID_KATEGORI = $id";
+        $sqlDelete = "DELETE FROM SBO_SUPPORT_SAPHANA.DIFFICULT_LEVEL WHERE ID_DIFFICULT = $id";
         $koneksi->exec($sqlDelete);
 
         return redirect()->route('admin.pengaturan.difficult')->with('success', 'Difficult setting deleted successfully.');
@@ -1102,19 +1094,19 @@ public function emailDestroy($id)
         }
 
         $request->validate([
-            'nama_kategori' => 'required|max:255|min:3', // Validasi nama kategori
+            'nama_DIFFICULT' => 'required|max:255|min:3', // Validasi nama DIFFICULT
             
         ]);
 
         $koneksi = HanaConnection::getConnection();
 
-        // Ambil ID_KATEGORI terakhir dan tambah 1
-        $sqlMaxId = "SELECT MAX(ID_KATEGORI) AS MAX_ID FROM SBO_CMNP_KK.KATEGORI";
+        // Ambil ID_DIFFICULT terakhir dan tambah 1
+        $sqlMaxId = "SELECT MAX(ID_DIFFICULT) AS MAX_ID FROM SBO_SUPPORT_SAPHANA.DIFFICULT_LEVEL";
         $resultId = $koneksi->query($sqlMaxId)->fetch(\PDO::FETCH_ASSOC);
         $nextId = (int) $resultId['MAX_ID'] + 1;
 
-        // Simpan kategori baru
-        $sqlInsert = "INSERT INTO SBO_CMNP_KK.KATEGORI (ID_KATEGORI, NAMA_KATEGORI) VALUES ($nextId, '{$request->nama_kategori}')";
+        // Simpan DIFFICULT baru
+        $sqlInsert = "INSERT INTO SBO_SUPPORT_SAPHANA.DIFFICULT_LEVEL (ID_DIFFICULT, NM_DIFFICULT) VALUES ($nextId, '{$request->nama_DIFFICULT}')";
         $koneksi->exec($sqlInsert);
 
         return redirect()->route('admin.pengaturan.difficult')->with('success', 'Difficult level added successfully.');
@@ -1134,7 +1126,7 @@ public function emailDestroy($id)
         }
 
         // Query langsung tanpa prepare-execute
-        $difficult = $koneksi->query("SELECT * FROM SBO_CMNP_KK.KATEGORI WHERE ID_KATEGORI = {$id}")->fetch(\PDO::FETCH_ASSOC);
+        $difficult = $koneksi->query("SELECT * FROM SBO_SUPPORT_SAPHANA.DIFFICULT_LEVEL WHERE ID_DIFFICULT = {$id}")->fetch(\PDO::FETCH_ASSOC);
 
         if (!$difficult) {
             abort(404); // Data tidak ditemukan
@@ -1150,15 +1142,15 @@ public function emailDestroy($id)
         }
 
         $request->validate([
-            'nama_kategori' => 'required|max:255|min:3', // Validasi nama kategori
+            'nama_DIFFICULT' => 'required|max:255|min:3', // Validasi nama DIFFICULT
             // Tambahkan validasi lain sesuai kebutuhan
 
         ]);
 
         $koneksi = HanaConnection::getConnection();
 
-        // Update kategori
-        $sqlUpdate = "UPDATE SBO_CMNP_KK.KATEGORI SET NAMA_KATEGORI = '{$request->nama_kategori}' WHERE ID_KATEGORI = {$id}";
+        // Update DIFFICULT
+        $sqlUpdate = "UPDATE SBO_SUPPORT_SAPHANA.DIFFICULT_LEVEL SET NM_DIFFICULT = '{$request->nama_DIFFICULT}' WHERE ID_DIFFICULT = {$id}";
         $koneksi->exec($sqlUpdate);
 
         return redirect()->route('admin.pengaturan.difficult')->with('success', 'Difficult level updated successfully.');
@@ -1171,11 +1163,9 @@ public function emailDestroy($id)
            abort(404); // Activity not found
         }
         $koneksi = HanaConnection::getConnection();
-        $statusSettings = $koneksi->query("SELECT * FROM SBO_CMNP_KK.STATUS_LEVEL")->fetchAll(\PDO::FETCH_ASSOC);
+        $statusSettings = $koneksi->query("SELECT * FROM SBO_SUPPORT_SAPHANA.STATUS_LEVEL")->fetchAll(\PDO::FETCH_ASSOC);
 
-        if (!$statusSettings) {
-            abort(404); // No status settings found
-        }
+        
         return view('admin.pengaturan.status', compact('statusSettings'));
     }
 
@@ -1188,7 +1178,7 @@ public function emailDestroy($id)
         $koneksi = HanaConnection::getConnection();
         $id = (int) $id;
 
-        $sqlDelete = "DELETE FROM SBO_CMNP_KK.STATUS_LEVEL WHERE ID_STATUS = $id";
+        $sqlDelete = "DELETE FROM SBO_SUPPORT_SAPHANA.STATUS_LEVEL WHERE ID_STATUS = $id";
         $koneksi->exec($sqlDelete);
 
         return redirect()->route('admin.pengaturan.status')->with('success', 'Status setting deleted successfully.');
@@ -1217,12 +1207,12 @@ public function emailDestroy($id)
         $koneksi = HanaConnection::getConnection();
 
         // Ambil ID_STATUS terakhir dan tambah 1
-        $sqlMaxId = "SELECT MAX(ID_STATUS) AS MAX_ID FROM SBO_CMNP_KK.STATUS_LEVEL";
+        $sqlMaxId = "SELECT MAX(ID_STATUS) AS MAX_ID FROM SBO_SUPPORT_SAPHANA.STATUS_LEVEL";
         $resultId = $koneksi->query($sqlMaxId)->fetch(\PDO::FETCH_ASSOC);
         $nextId = (int) $resultId['MAX_ID'] + 1;
 
         // Simpan status baru
-        $sqlInsert = "INSERT INTO SBO_CMNP_KK.STATUS_LEVEL (ID_STATUS, NM_STATUS) VALUES ($nextId, '{$request->nama_status}')";
+        $sqlInsert = "INSERT INTO SBO_SUPPORT_SAPHANA.STATUS_LEVEL (ID_STATUS, NM_STATUS) VALUES ($nextId, '{$request->nama_status}')";
         $koneksi->exec($sqlInsert);
 
         return redirect()->route('admin.pengaturan.status')->with('success', 'Status level added successfully.');
@@ -1242,7 +1232,7 @@ public function emailDestroy($id)
         }
 
         // Query langsung tanpa prepare-execute
-        $status = $koneksi->query("SELECT * FROM SBO_CMNP_KK.STATUS_LEVEL WHERE ID_STATUS = {$id}")->fetch(\PDO::FETCH_ASSOC);
+        $status = $koneksi->query("SELECT * FROM SBO_SUPPORT_SAPHANA.STATUS_LEVEL WHERE ID_STATUS = {$id}")->fetch(\PDO::FETCH_ASSOC);
 
         if (!$status) {
             abort(404); // Data tidak ditemukan
@@ -1266,7 +1256,7 @@ public function emailDestroy($id)
         $koneksi = HanaConnection::getConnection();
 
         // Update status
-        $sqlUpdate = "UPDATE SBO_CMNP_KK.STATUS_LEVEL SET NM_STATUS = '{$request->nama_status}' WHERE ID_STATUS = {$id}";
+        $sqlUpdate = "UPDATE SBO_SUPPORT_SAPHANA.STATUS_LEVEL SET NM_STATUS = '{$request->nama_status}' WHERE ID_STATUS = {$id}";
         $koneksi->exec($sqlUpdate);
 
         return redirect()->route('admin.pengaturan.status')->with('success', 'Status level updated successfully.');

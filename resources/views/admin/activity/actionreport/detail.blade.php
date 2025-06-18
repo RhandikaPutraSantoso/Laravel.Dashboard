@@ -64,7 +64,7 @@
     </tr>
     <tr>
         <th>Kategori</th>
-        <td>{{ $activity['NAMA_KATEGORI'] ?? '-' }}</td>
+        <td>{{ $activity['NM_DIFFICULT'] ?? '-' }}</td>
     </tr>
 </table>
 
