@@ -23,7 +23,7 @@ class dashboardController extends Controller
         FROM SBO_SUPPORT_SAPHANA.ACTIVITY
         WHERE ID_DIFFICULT IS NULL
         ORDER BY TGL_ACTIVITY DESC
-        LIMIT 5
+        
     ";
 
     $statusQuery = "
@@ -31,7 +31,7 @@ class dashboardController extends Controller
         FROM SBO_SUPPORT_SAPHANA.ACTIVITY
         WHERE ID_STATUS IS NULL
         ORDER BY TGL_STATUS DESC
-        LIMIT 5
+        
     ";
 
     $solvedQuery = "
@@ -39,7 +39,7 @@ class dashboardController extends Controller
         FROM SBO_SUPPORT_SAPHANA.ACTIVITY
         WHERE TGL_SOLVED IS NULL
         ORDER BY TGL_SOLVED DESC
-        LIMIT 5
+        
     ";
 
     $report = $koneksi->query($reportQuery)->fetchAll(\PDO::FETCH_ASSOC);
@@ -80,9 +80,7 @@ class dashboardController extends Controller
         $where .= " AND YEAR(TGL_ACTIVITY) = " . (int) $request->tahun;
     }
 
-    // =======================
-    // 1. CHART PER COMPANY
-    // =======================
+// chart company
     $chartQuery = "
         SELECT COMPANY_SAP.NM_COMPANY, COUNT(*) AS JUMLAH 
         FROM SBO_SUPPORT_SAPHANA.ACTIVITY
@@ -92,9 +90,7 @@ class dashboardController extends Controller
     ";
     $dataChart = $koneksi->query($chartQuery)->fetchAll();
 
-    // =======================
-    // 2. TABEL AKTIVITAS
-    // =======================
+// tabel aktivitas
     $tabelQuery = "
         SELECT * 
         FROM SBO_SUPPORT_SAPHANA.ACTIVITY 
@@ -102,20 +98,26 @@ class dashboardController extends Controller
     ";
     $aktivitas = $koneksi->query($tabelQuery)->fetchAll();
 
-    // =======================
-    // 3. TASK REPORT: FINISHED & REMAINING
-    // =======================
+//    task report => finish & remaining
     $finishedQuery = "
-        SELECT COUNT(ID_ACTIVITY) AS JUMLAH 
-        FROM SBO_SUPPORT_SAPHANA.ACTIVITY 
-        WHERE TGL_KOMENTAR IS NOT NULL
+        SELECT COUNT(*) AS JUMLAH FROM (
+        SELECT ID_ACTIVITY, TIKET, TGL_ACTIVITY AS TANGGAL FROM SBO_SUPPORT_SAPHANA.ACTIVITY WHERE ID_DIFFICULT IS NOT NULL
+        UNION ALL
+        SELECT ID_ACTIVITY, TIKET, TGL_STATUS AS TANGGAL FROM SBO_SUPPORT_SAPHANA.ACTIVITY WHERE ID_STATUS IS NOT NULL
+        UNION ALL
+        SELECT ID_ACTIVITY, TIKET, TGL_SOLVED AS TANGGAL FROM SBO_SUPPORT_SAPHANA.ACTIVITY WHERE TGL_SOLVED IS NOT NULL
+    ) AS gabungan
     ";
     $finished = $koneksi->query($finishedQuery)->fetch()['JUMLAH'];
 
     $remainingQuery = "
-        SELECT COUNT(ID_ACTIVITY) AS JUMLAH 
-        FROM SBO_SUPPORT_SAPHANA.ACTIVITY 
-        WHERE TGL_KOMENTAR IS NULL
+        SELECT COUNT(*) AS JUMLAH FROM (
+        SELECT ID_ACTIVITY, TIKET, TGL_ACTIVITY AS TANGGAL FROM SBO_SUPPORT_SAPHANA.ACTIVITY WHERE ID_DIFFICULT IS NULL
+        UNION ALL
+        SELECT ID_ACTIVITY, TIKET, TGL_STATUS AS TANGGAL FROM SBO_SUPPORT_SAPHANA.ACTIVITY WHERE ID_STATUS IS NULL
+        UNION ALL
+        SELECT ID_ACTIVITY, TIKET, TGL_SOLVED AS TANGGAL FROM SBO_SUPPORT_SAPHANA.ACTIVITY WHERE TGL_SOLVED IS NULL
+    ) AS gabungan
     ";
     $remaining = $koneksi->query($remainingQuery)->fetch()['JUMLAH'];
 

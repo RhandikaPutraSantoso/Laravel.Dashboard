@@ -12,6 +12,12 @@
   <meta name="mobile-web-app-capable" content="yes">
     @include('admin.components.css')
 <style>
+    .box {
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  color: 'inherit';
+}
+
    .box .col-6 {
     padding: 10px;
   }
@@ -41,12 +47,7 @@
     font-size: 12px;
   
   }
-  .box {
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-  color: 'inherit'
-}
-
+  
 </style>
 
 </head>
@@ -90,30 +91,39 @@
     </div>
 
    <!--Task Report-->
-<div class="box white">
-    <div class="box-header white d-flex justify-content-between align-items-center">
+@php
+    use Carbon\Carbon;
+    $today = Carbon::now()->locale('id')->translatedFormat('d F Y'); 
+@endphp
+
+<div class="box">
+    <div class="box-header d-flex justify-content-between align-items-center">
         <div>
             <h3 class="mb-0">Tasks</h3>
-            <small>Calculated in last 7 days</small>
+            <small>Total Of Tasks</small>
+            <small >{{ $today }}</small>
         </div>
-        <div class="d-flex gap-2 align-items-center">
-            <i class="material-icons">refresh</i>
-            <i class="material-icons">more_vert</i>
+        <div class="d-flex gap-3 align-items-center">
+            <!-- Tombol Refresh -->
+            <button id="refreshBtn" class="btn btn-sm btn-outline-secondary" title="Refresh">
+                <i class="material-icons">refresh</i>
+            </button>
         </div>
     </div>
+
     <div class="row no-gutters text-center" style="padding: 20px 0;">
-        <div class="col-6 white">
-            <canvas id="finishedChart" width="120" height="120"></canvas>
+        <div class="col-6">
+            <canvas id="finishedChart" style="height: 120px;"></canvas>
             <div class="mt-2">
                 <strong>Finished</strong>
-                <div>{{ $finished }}</div>
+                <div>{{ $finished ?? 0 }}</div>
             </div>
         </div>
-        <div class="col-6 white">
-            <canvas id="remainingChart" width="120" height="120"></canvas>
+        <div class="col-6">
+            <canvas id="remainingChart" style="height: 120px;"></canvas>
             <div class="mt-2">
                 <strong>Remaining</strong>
-                <div>{{ $remaining }}</div>
+                <div>{{ $remaining ?? 0 }}</div>
             </div>
         </div>
     </div>
@@ -248,20 +258,21 @@
 </script>
 
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // Plugin untuk menampilkan persen di tengah chart
     const centerTextPlugin = {
         id: 'centerText',
         beforeDraw(chart) {
             const { width, height } = chart;
             const ctx = chart.ctx;
+            ctx.clearRect(0, 0, width, height);
             const dataset = chart.data.datasets[0].data;
             const total = dataset.reduce((a, b) => a + b, 0);
             const percent = Math.round((dataset[0] / total) * 100) + '%';
 
             ctx.save();
-            ctx.font = 'bold 18px sans-serif';
-            ctx.fillStyle = '#000';
+            ctx.font = 'bold 16px sans-serif';
+            ctx.fillStyle = '';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(percent, width / 2, height / 2);
@@ -269,44 +280,60 @@
         }
     };
 
-    // Registrasi plugin
     Chart.register(centerTextPlugin);
 
-    // Opsi chart umum
     const chartOptions = {
         cutout: '70%',
+        responsive: true,
+        maintainAspectRatio: false,
         plugins: {
             tooltip: { enabled: false },
             legend: { display: false }
         }
     };
 
-    // Chart Finished
-    new Chart(document.getElementById('finishedChart'), {
-        type: 'doughnut',
-        data: {
-            datasets: [{
-                data: [{{ $finishedPercent }}, 100 - {{ $finishedPercent }}],
-                backgroundColor: ['#1abc9c', '#eeeeee'],
-                borderWidth: 7
-            }]
-        },
-        options: chartOptions,
-        plugins: [centerTextPlugin]
-    });
+    let finishedChart, remainingChart;
 
-    // Chart Remaining
-    new Chart(document.getElementById('remainingChart'), {
-        type: 'doughnut',
-        data: {
-            datasets: [{
-                data: [{{ $remainingPercent }}, 100 - {{ $remainingPercent }}],
-                backgroundColor: ['#f1c40f', '#eeeeee'],
-                borderWidth: 7
-            }]
-        },
-        options: chartOptions,
-        plugins: [centerTextPlugin]
+    function renderCharts() {
+        const finishedPercent = {{ $finishedPercent ?? 0 }};
+        const remainingPercent = {{ $remainingPercent ?? 0 }};
+
+        if (finishedChart) finishedChart.destroy();
+        if (remainingChart) remainingChart.destroy();
+
+        finishedChart = new Chart(document.getElementById('finishedChart'), {
+            type: 'doughnut',
+            data: {
+                datasets: [{
+                    data: [finishedPercent, 100 - finishedPercent],
+                    backgroundColor: ['#1abc9c', '#eeeeee'],
+                    borderWidth: 7
+                }]
+            },
+            options: chartOptions,
+            plugins: [centerTextPlugin]
+        });
+
+        remainingChart = new Chart(document.getElementById('remainingChart'), {
+            type: 'doughnut',
+            data: {
+                datasets: [{
+                    data: [remainingPercent, 100 - remainingPercent],
+                    backgroundColor: ['#f1c40f', '#eeeeee'],
+                    borderWidth: 7
+                }]
+            },
+            options: chartOptions,
+            plugins: [centerTextPlugin]
+        });
+    }
+
+    // Render awal
+    renderCharts();
+
+    // Event tombol refresh
+    document.getElementById('refreshBtn').addEventListener('click', function () {
+        renderCharts(); // bisa ditambahkan fetch data terbaru via AJAX kalau mau
     });
 </script>
 
