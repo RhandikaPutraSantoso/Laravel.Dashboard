@@ -20,7 +20,7 @@
 
             <li>
               {{-- Compare the current URL with '/index' or pass a variable from the controller --}}
-              <a href="{{ Route('#') }}" class="{{ Request::is('index') ? 'active' : '' }}">
+              <a href="{{ Route('user.dashboardUser') }}" class="{{ Request::is('index') ? 'active' : '' }}">
                 <span class="nav-icon">
                   <i class="material-icons">&#xe3fc;
                     <span ui-include="'{{ asset('layouts/assets/images/i_0.svg') }}'"></span>

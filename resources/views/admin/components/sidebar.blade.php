@@ -226,7 +226,10 @@
                 <span class="nav-text">service Activity log</span>
               </a>
               <ul class="nav-sub">
-                {{-- service log --}}
+                
+                <li></li>
+                <li></li>
+                <li></li>
                 
                 
 

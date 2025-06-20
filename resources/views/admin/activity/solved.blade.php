@@ -16,6 +16,12 @@
 <body>
 @include('admin.components.sidebar')
 <div class="padding">
+    @if(session('success'))
+    <div class="alert alert-success">{{ session('success') }}</div>
+@endif
+@if(session('error'))
+    <div class="alert alert-danger">{{ session('error') }}</div>
+@endif
     <h2>SOLVED FOR SAP</h2>
     <div class="padding">
         <div class="box">

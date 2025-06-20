@@ -5,6 +5,11 @@ namespace App\Http\Controllers;
 use App\Helpers\HanaConnection;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\ActivityReportMail;
+use Illuminate\Support\Facades\Log;
+
+use Exception;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Session;
@@ -136,7 +141,42 @@ class dashboardController extends Controller
     ));
 }
 
+public function sendEmail($id)
+{
+    date_default_timezone_set("Asia/Jakarta");
+    try {
+        $koneksi = HanaConnection::getConnection();
+        $id = intval($id);
 
+        // Ambil data aktivitas
+        $queryAkt = "SELECT 
+                ACTIVITY.*, 
+                COMPANY_SAP.NM_COMPANY 
+            FROM SBO_SUPPORT_SAPHANA.ACTIVITY 
+            LEFT JOIN SBO_SUPPORT_SAPHANA.COMPANY_SAP ON ACTIVITY.ID_COMPANY = COMPANY_SAP.ID_COMPANY 
+            WHERE ID_ACTIVITY = $id";
+
+        $stmt = $koneksi->query($queryAkt);
+        $activity = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+        if (!$activity || empty($activity['MAIL_COMPANY'])) {
+            return back()->with('error', 'Data aktivitas atau email tidak ditemukan.');
+        }
+
+        // Ambil semua foto dari tabel foto aktivitas (asumsi nama tabel: ACTIVITY_FOTO)
+        $queryFoto = "SELECT NM_ACTIVITY_FOTO FROM SBO_SUPPORT_SAPHANA.ACTIVITY_FOTO WHERE ID_ACTIVITY = $id";
+        $stmtFoto = $koneksi->query($queryFoto);
+        $fotos = $stmtFoto->fetchAll(\PDO::FETCH_ASSOC);
+
+        // Kirim email
+        Mail::to($activity['MAIL_COMPANY'])->send(new ActivityReportMail($activity, $fotos));
+
+        return back()->with('success', 'Email berhasil dikirim ke ' . $activity['MAIL_COMPANY']);
+    } catch (Exception $e) {
+        Log::error('Email gagal: ' . $e->getMessage());
+        return back()->with('error', 'Terjadi kesalahan saat mengirim email.');
+    }
+}
 
 
 
@@ -175,6 +215,8 @@ class dashboardController extends Controller
 
         return view('admin.activity.report', compact('activities'));
     }
+
+
             public function cetakBeritaAcara($id)
 {   
     date_default_timezone_set("Asia/Jakarta");
@@ -353,6 +395,7 @@ class dashboardController extends Controller
                 if (!session('admin_sap')) {
            abort(404); // Activity not found
         }
+                        date_default_timezone_set("Asia/Jakarta");
 
                 $request->validate([
                     'company' => 'required',
@@ -365,7 +408,6 @@ class dashboardController extends Controller
                 ]);
 
                 $koneksi = HanaConnection::getConnection();
-                date_default_timezone_set("Asia/Jakarta");
                 $TGL_ACTIVITY = date("Y-m-d H:i:s");
 
                 // Ambil ID terakhir
@@ -676,7 +718,6 @@ class dashboardController extends Controller
                         'username' => 'required',
                         'subject' => 'required|max:255',
                         'deskripsi' => 'required',
-                        'komentar' => 'nullable', // Assuming komentar can be empty
                         'ID_STATUS' => 'required|numeric',
                         'foto_baru.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048' // For new photos
                     ]);
@@ -691,7 +732,6 @@ class dashboardController extends Controller
                             NM_USER = ?,
                             SUBJECT = ?,
                             DESKRIPSI = ?,
-                            KOMENTAR = ?,
                             ID_STATUS = ?,
                             TGL_STATUS = ?
                         WHERE ID_ACTIVITY = ?
@@ -702,8 +742,7 @@ class dashboardController extends Controller
                         $request->email,
                         $request->username,
                         $request->subject,
-                        $request->deskripsi,
-                        $request->komentar,
+                        $request->deskripsi,                        
                         $request->ID_STATUS,
                         $TGL_STATUS,
                         $id

@@ -16,8 +16,16 @@
 
 </head>
 <body>
+
 @include('admin.components.sidebar')
 <div class="padding">
+    @if(session('success'))
+    <div class="alert alert-success">{{ session('success') }}</div>
+@endif
+@if(session('error'))
+    <div class="alert alert-danger">{{ session('error') }}</div>
+@endif
+
     <h2>REQUESTS FOR SAP</h2>
     <div class="padding">
         
@@ -84,12 +92,6 @@
                                         @csrf
                                         @method('DELETE')
                                     </form>
-
-
-                                    <a href="https://mail.google.com/mail/?view=cm&fs=1&to=rhndkputr@gmail.com&su={{ urlencode($activity['SUBJECT']) }}&body={{ urlencode(strip_tags($activity['DESKRIPSI']) . "\n\nFoto: https://sap.cmnp.co.id/foto_produk/" . ($activity['FOTO'] ?? 'Tidak tersedia')) }}" target="_blank" class="btn btn-success btn-sm">
-                                        <i class="glyphicon glyphicon-envelope"></i> Kirim Email
-                                    </a>
-
                                     <a href="{{ route('admin.activity.berita_acara_pdf', ['id' => $activity['ID_ACTIVITY']]) }}" class="btn btn-secondary btn-sm" target="_blank"><i class="glyphicon glyphicon-print"></i> Cetak Berita Acara</a>
                                 </div>
                             </td>

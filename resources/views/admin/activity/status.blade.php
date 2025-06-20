@@ -19,6 +19,12 @@
     
     <h2>STATUS FOR SAP</h2>
     <div class="padding">
+        @if(session('success'))
+    <div class="alert alert-success">{{ session('success') }}</div>
+@endif
+@if(session('error'))
+    <div class="alert alert-danger">{{ session('error') }}</div>
+@endif
         <div class="box">
             <div class="box-header">
                 <h2>Aktivitas Perusahaan</h2>
@@ -68,7 +74,22 @@
 
                                     <a href="{{ route('admin.activity.actionstatus.ubah', $activity['ID_ACTIVITY']) }}" class="btn btn-warning btn-sm">
                                         <i class="glyphicon glyphicon-edit"></i> Ubah</a>
-                                    
+                                    <a href="#" 
+                                    class="btn btn-success btn-sm"
+                                    onclick="event.preventDefault(); 
+                                                if(confirm('Kirim email aktivitas ini ke perusahaan?')) {
+                                                    document.getElementById('send-email-{{ $activity['ID_ACTIVITY'] }}').submit();
+                                                }">
+                                        <i class="glyphicon glyphicon-envelope"></i> Kirim Email
+                                    </a>
+
+                                    <form id="send-email-{{ $activity['ID_ACTIVITY'] }}" 
+                                        action="{{ route('admin.activity.sendEmail', ['id' => $activity['ID_ACTIVITY']]) }}" 
+                                        method="POST" 
+                                        style="display: none;">
+                                        @csrf
+                                    </form>
+
                                 </div>
                             </td>
                         </tr>

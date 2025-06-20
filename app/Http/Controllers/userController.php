@@ -101,86 +101,108 @@ class userController extends Controller
             }
 // This method is used to store a new activity report
             public function activityStore(Request $request)
-            {
-                if (!Session::has('user_sap') || !Session::has('company')) {
-                    abort(404); }
-                    
-                    $koneksi = HanaConnection::getConnection();
-                   
-                    date_default_timezone_set("Asia/Jakarta");
+{
+    if (!Session::has('user_sap') || !Session::has('company')) {
+        abort(404);
+    }
 
-                    $request->validate([
-                        'company' => 'required',
-                        'email' => 'required',
-                        'username' => 'required',
-                        'Subject' => 'required',
-                        'deskripsi' => 'required',
-                        'foto.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-                    ]);
+    $koneksi = HanaConnection::getConnection();
+    date_default_timezone_set("Asia/Jakarta");
 
-                    // Ambil ID_ACTIVITY terakhir
-                    $stmt = $koneksi->query("SELECT MAX(ID_ACTIVITY) AS ID FROM SBO_SUPPORT_SAPHANA.ACTIVITY");
-                    $last = $stmt->fetch(\PDO::FETCH_ASSOC);
-                    $nextId = $last['ID'] + 1;
+    $request->validate([
+        'company' => 'required',
+        'email' => 'required',
+        'username' => 'required',
+        'Subject' => 'required',
+        'deskripsi' => 'required',
+        'foto.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+    ]);
 
-                    $TGL_ACTIVITY = date("Y-m-d H:i:s");
+    // Ambil ID_ACTIVITY terakhir
+    $stmt = $koneksi->query("SELECT MAX(ID_ACTIVITY) AS ID FROM SBO_SUPPORT_SAPHANA.ACTIVITY");
+    $last = $stmt->fetch(\PDO::FETCH_ASSOC);
+    $nextIdInt = $last['ID'] + 1;
+    $TGL_ACTIVITY = date("Y-m-d H:i:s");
 
-                    // Ambil nama company dari ID
-                    $companyName = '';
-                    $query = $koneksi->query("SELECT * FROM SBO_SUPPORT_SAPHANA.COMPANY_SAP WHERE ID_COMPANY = '{$request->company}'");
-                    if ($row = $query->fetch(\PDO::FETCH_ASSOC)) {
-                        $companyName = $row['NM_COMPANY'];
-                    }
+    // Ambil nama company dari ID
+    $companyName = '';
+    $query = $koneksi->query("SELECT NM_COMPANY FROM SBO_SUPPORT_SAPHANA.COMPANY_SAP WHERE ID_COMPANY = '{$request->company}'");
+    if ($row = $query->fetch(\PDO::FETCH_ASSOC)) {
+        $companyName = strtolower(trim($row['NM_COMPANY']));
+    } else {
+        return back()->with('error', 'Nama perusahaan tidak ditemukan.');
+    }
 
-                    $tiket = "TIKET-" . strtoupper($nextId) . strtoupper(str_replace(" ", "_", $companyName));
-                    $mainPhotoName = null;
+    // Tentukan kode perusahaan
+    $kodePerusahaan = match ($companyName) {
+        'cmnp' => '01',
+        'cpi' => '02',
+        'cw' => '03',
+        'cms' => '04',
+        'cmnproper' => '05',
+        'cmlj' => '06',
+        'ckjt' => '07',
+        default => 'UNK',
+    };
 
-                    $uploadedPhotos = [];
+    // Format nomor urut 4 digit
+    $nomorUrut = str_pad($nextIdInt, 4, '0', STR_PAD_LEFT);
 
-                    if ($request->hasFile('foto')) {
-                        foreach ($request->file('foto') as $file) {
-                            $uniqueName = uniqid('foto_', true) . '.' . $file->getClientOriginalExtension();
-                            $file->storeAs('uploads', $uniqueName, 'public');
-                            $uploadedPhotos[] = $uniqueName;
-                        }
+    // Format tahun dan bulan
+    $yearCode = date('y');
+    $monthCode = date('m');
 
-                        $mainPhotoName = $uploadedPhotos[0] ?? null;
-                    }
+    // Buat TIKET
+    $tiket = "TIKET-{$kodePerusahaan}{$yearCode}{$monthCode}{$nomorUrut}";
 
-                    // Simpan aktivitas
-                    $stmt = $koneksi->prepare("INSERT INTO SBO_SUPPORT_SAPHANA.ACTIVITY 
-                        (ID_ACTIVITY, ID_COMPANY, MAIL_COMPANY, NM_USER, SUBJECT, DESKRIPSI, ID_ACTIVITY_FOTO, TGL_ACTIVITY, TIKET)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    // Proses upload foto
+    $mainPhotoName = null;
+    $uploadedPhotos = [];
 
-                    $stmt->execute([
-                        $nextId,
-                        $request->company,
-                        $request->email,
-                        $request->username,
-                        $request->Subject,
-                        $request->deskripsi,
-                        $mainPhotoName,
-                        $TGL_ACTIVITY,
-                        $tiket
-                    ]);
+    if ($request->hasFile('foto')) {
+        foreach ($request->file('foto') as $file) {
+            $uniqueName = uniqid('foto_', true) . '.' . $file->getClientOriginalExtension();
+            $file->storeAs('uploads', $uniqueName, 'public');
+            $uploadedPhotos[] = $uniqueName;
+        }
+        $mainPhotoName = $uploadedPhotos[0] ?? null;
+    }
 
-                    // Simpan ke tabel foto
-                    foreach ($uploadedPhotos as $photoName) {
-                        $stmt = $koneksi->query("SELECT MAX(ID_ACTIVITY_FOTO) AS ID FROM SBO_SUPPORT_SAPHANA.ACTIVITY_FOTO");
-                        $last = $stmt->fetch(\PDO::FETCH_ASSOC);
-                        $nextFotoId = $last['ID'] + 1;
+    // Simpan ke tabel aktivitas
+    $stmt = $koneksi->prepare("INSERT INTO SBO_SUPPORT_SAPHANA.ACTIVITY 
+        (ID_ACTIVITY, ID_COMPANY, MAIL_COMPANY, NM_USER, SUBJECT, DESKRIPSI, ID_ACTIVITY_FOTO, TGL_ACTIVITY, TIKET)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
-                        $koneksi->prepare("INSERT INTO SBO_SUPPORT_SAPHANA.ACTIVITY_FOTO (ID_ACTIVITY_FOTO, ID_ACTIVITY, NM_ACTIVITY_FOTO)
-                        VALUES (?, ?, ?)")->execute([
-                            $nextFotoId,
-                            $nextId,
-                            $photoName
-                        ]);
-                    }
+    $stmt->execute([
+        $nextIdInt,
+        $request->company,
+        $request->email,
+        $request->username,
+        $request->Subject,
+        $request->deskripsi,
+        $mainPhotoName,
+        $TGL_ACTIVITY,
+        $tiket
+    ]);
 
-             return redirect()->route('user.activity.report')->with('success', 'Data berhasil disimpan.');
-    
-            }
+    // Simpan semua foto ke tabel ACTIVITY_FOTO
+    foreach ($uploadedPhotos as $photoName) {
+        $stmtFoto = $koneksi->query("SELECT MAX(ID_ACTIVITY_FOTO) AS ID FROM SBO_SUPPORT_SAPHANA.ACTIVITY_FOTO");
+        $lastFoto = $stmtFoto->fetch(\PDO::FETCH_ASSOC);
+        $nextFotoId = $lastFoto['ID'] + 1;
+
+        $koneksi->prepare("INSERT INTO SBO_SUPPORT_SAPHANA.ACTIVITY_FOTO (ID_ACTIVITY_FOTO, ID_ACTIVITY, NM_ACTIVITY_FOTO)
+            VALUES (?, ?, ?)")
+            ->execute([
+                $nextFotoId,
+                $nextIdInt,
+                $photoName
+            ]);
+    }
+
+    return redirect()->route('user.activity.report')->with('success', 'Data berhasil disimpan.');
+}
+
 
                 public function activitydetail($id)
                 {
