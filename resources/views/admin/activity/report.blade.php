@@ -19,12 +19,37 @@
 
 @include('admin.components.sidebar')
 <div class="padding">
-    @if(session('success'))
-    <div class="alert alert-success">{{ session('success') }}</div>
+ @if(session('success'))
+    <div class="alert alert-success alert-dismissible fade show" role="alert" id="success-alert">
+        {{ session('success') }}
+    </div>
 @endif
+
 @if(session('error'))
-    <div class="alert alert-danger">{{ session('error') }}</div>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert" id="error-alert">
+        {{ session('error') }}
+    </div>
 @endif
+
+<script>
+    setTimeout(function() {
+        var successAlert = document.getElementById('success-alert');
+        var errorAlert = document.getElementById('error-alert');
+
+        if (successAlert) {
+            successAlert.style.transition = "opacity 0.5s ease-out";
+            successAlert.style.opacity = 0;
+            setTimeout(() => successAlert.remove(), 500);
+        }
+
+        if (errorAlert) {
+            errorAlert.style.transition = "opacity 0.5s ease-out";
+            errorAlert.style.opacity = 0;
+            setTimeout(() => errorAlert.remove(), 500);
+        }
+    }, 5000); // 5 detik
+</script>
+
 
     <h2>REQUESTS FOR SAP</h2>
     <div class="padding">

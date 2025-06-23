@@ -45,95 +45,187 @@
 
   .box small {
     font-size: 12px;
-  
   }
+
+  .chart-container {
+  position: relative;
+  width: 100%;
+  height: 150px;
+}
+
+.chart-center-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-weight: bold;
+  font-size: 16px;
   
+  pointer-events: none;
+}
+
+
+
 </style>
 
 </head>
 <body>
     @include('admin.components.sidebar')
-<div class="padding white">
+    <div class="padding">
+      <div class="box">
+        <div class="padding white">
+          <div class="box">
+            
+            <h1>Selamat Datang di Administrator CMNP GROUP Official </h1>
+            <br>
+
+            <!-- Form Filter -->
+            <form method="GET" class="m-b-lg white">
+                <label for="bulan">Bulan:</label>
+                <select name="bulan" class="display-inline ">
+                    <option value="">Semua</option>
+                    @for ($i = 1; $i <= 12; $i++)
+                        <option value="{{ $i }}" {{ request('bulan') == $i ? 'selected' : '' }}>
+                            {{ Carbon\Carbon::create()->month($i)->translatedFormat('F') }}
+                        </option>
+                    @endfor
+                </select>
+
+                <label for="tahun">Tahun:</label>
+                <select name="tahun" class=" display-inline ">
+                    <option value="">Semua</option>
+                    @for ($y = date('Y'); $y >= date('Y') - 5; $y--)
+                        <option value="{{ $y }}" {{ request('tahun') == $y ? 'selected' : '' }}>{{ $y }}</option>
+                    @endfor
+                </select>
+
+                <button type="submit" class="btn btn-primary">Filter</button>
+            </form>
+
+            <!-- Chart -->
+            <canvas id="bar-chart"></canvas>
+            <div id="custom-legend" class="white" style="display:flex; flex-wrap:wrap; justify-content:center; margin-top:20px; gap:20px;"></div>
+
+            <!-- Tombol Reset -->
+            <div style="text-align:center; margin-top:10px;">
+                <button id="resetChartBtn" class="btn btn-secondary" style="display: none;">Reset Chart</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+<!-- Task Report -->
+  @php
+      use Carbon\Carbon;
+      $today = Carbon::now()->locale('id')->translatedFormat('d F Y');
+  @endphp
+  <div class="padding">
+  <div class="box">
+    <div class="box-header d-flex  text-center justify-content-between  ">
+      <div>
+        <h3 class="mb-0">Tasks</h3>
+        <small>Total Of Tasks</small>
+        <small>{{ $today }}</small>
+      </div>
+      <div class="d-flex gap-3 align-items-center">
+        <button id="refreshBtn" class="btn btn-sm btn-outline-secondary" title="Refresh">
+          <i class="material-icons">refresh</i>
+        </button>
+      </div>
+    </div>
     
-    <h1>Selamat Datang di Administrator CMNP GROUP Official </h1>
-    <br>
 
-    <!-- Form Filter -->
-    <form method="GET" class="m-b-lg white">
-        <label for="bulan">Bulan:</label>
-        <select name="bulan" class="display-inline ">
-            <option value="">Semua</option>
-            @for ($i = 1; $i <= 12; $i++)
-                <option value="{{ $i }}" {{ request('bulan') == $i ? 'selected' : '' }}>
-                    {{ \Carbon\Carbon::create()->month($i)->translatedFormat('F') }}
-                </option>
-            @endfor
-        </select>
-
-        <label for="tahun">Tahun:</label>
-        <select name="tahun" class=" display-inline ">
-            <option value="">Semua</option>
-            @for ($y = date('Y'); $y >= date('Y') - 5; $y--)
-                <option value="{{ $y }}" {{ request('tahun') == $y ? 'selected' : '' }}>{{ $y }}</option>
-            @endfor
-        </select>
-
-        <button type="submit" class="btn btn-primary">Filter</button>
-    </form>
-
-    <!-- Chart -->
-    <canvas id="bar-chart"></canvas>
-    <div id="custom-legend" class="white" style="display:flex; flex-wrap:wrap; justify-content:center; margin-top:20px; gap:20px;"></div>
-
-    <!-- Tombol Reset -->
-    <div style="text-align:center; margin-top:10px;">
-        <button id="resetChartBtn" class="btn btn-secondary" style="display: none;">Reset Chart</button>
+    <div class="row  text-center" >
+      <div class="col-6">
+        <div class="chart-container" id="finishedChartContainer">
+          <canvas id="finishedChart"></canvas>
+        </div>
+        <div class="mt-2 ">
+          <strong>Finished</strong>
+          <div>{{ $finished ?? 0 }}</div>
+        </div>
+      </div>
+      <div class="col-6">
+        <div class="chart-container" id="remainingChartContainer">
+          <canvas id="remainingChart"></canvas>
+        </div>
+        <div class="mt-2 ">
+          <strong>Remaining</strong>
+          <div>{{ $remaining ?? 0 }}</div>
+        </div>
+      </div>
     </div>
-
-   <!--Task Report-->
-@php
-    use Carbon\Carbon;
-    $today = Carbon::now()->locale('id')->translatedFormat('d F Y'); 
-@endphp
-
-<div class="box">
-    <div class="box-header d-flex justify-content-between align-items-center">
-        <div>
-            <h3 class="mb-0">Tasks</h3>
-            <small>Total Of Tasks</small>
-            <small >{{ $today }}</small>
-        </div>
-        <div class="d-flex gap-3 align-items-center">
-            <!-- Tombol Refresh -->
-            <button id="refreshBtn" class="btn btn-sm btn-outline-secondary" title="Refresh">
-                <i class="material-icons">refresh</i>
-            </button>
-        </div>
-    </div>
-
-    <div class="row no-gutters text-center" style="padding: 20px 0;">
-        <div class="col-6">
-            <canvas id="finishedChart" style="height: 120px;"></canvas>
-            <div class="mt-2">
-                <strong>Finished</strong>
-                <div>{{ $finished ?? 0 }}</div>
-            </div>
-        </div>
-        <div class="col-6">
-            <canvas id="remainingChart" style="height: 120px;"></canvas>
-            <div class="mt-2">
-                <strong>Remaining</strong>
-                <div>{{ $remaining ?? 0 }}</div>
-            </div>
-        </div>
-    </div>
+  </div>
 </div>
 
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  const chartOptions = {
+    cutout: '70%',
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      tooltip: { enabled: false },
+      legend: { display: false }
+    }
+  };
 
+  let finishedChart, remainingChart;
+
+  function renderCenterText(containerId, value) {
+    const container = document.getElementById(containerId);
+    const existing = container.querySelector('.chart-center-text');
+    if (existing) existing.remove();
+
+    const textDiv = document.createElement('div');
+    textDiv.className = 'chart-center-text';
+    textDiv.textContent = `${value}%`;
+    container.appendChild(textDiv);
+  }
+
+  function renderCharts() {
+    const finishedPercent = {{ $finishedPercent ?? 0 }};
+    const remainingPercent = {{ $remainingPercent ?? 0 }};
+
+    if (finishedChart) finishedChart.destroy();
+    if (remainingChart) remainingChart.destroy();
+
+    finishedChart = new Chart(document.getElementById('finishedChart'), {
+      type: 'doughnut',
+      data: {
+        datasets: [{
+          data: [finishedPercent, 100 - finishedPercent],
+          backgroundColor: ['#1abc9c', '#eeeeee'],
+          borderWidth: 7
+        }]
+      },
+      options: chartOptions
+    });
+
+    remainingChart = new Chart(document.getElementById('remainingChart'), {
+      type: 'doughnut',
+      data: {
+        datasets: [{
+          data: [remainingPercent, 100 - remainingPercent],
+          backgroundColor: ['#f1c40f', '#eeeeee'],
+          borderWidth: 7
+        }]
+      },
+      options: chartOptions
+    });
+
+    renderCenterText('finishedChartContainer', finishedPercent);
+    renderCenterText('remainingChartContainer', remainingPercent);
+  }
+
+  renderCharts();
+
+  document.getElementById('refreshBtn').addEventListener('click', renderCharts);
+</script>
 
     <!-- Tabel -->
-    <br><br>
-    <div class="padding ">
+    <div class="padding">
     <div class="box">
         <div class="box-header">
             <h2>Aktivitas Perusahaan</h2>
@@ -258,84 +350,7 @@
 </script>
 
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    const centerTextPlugin = {
-        id: 'centerText',
-        beforeDraw(chart) {
-            const { width, height } = chart;
-            const ctx = chart.ctx;
-            ctx.clearRect(0, 0, width, height);
-            const dataset = chart.data.datasets[0].data;
-            const total = dataset.reduce((a, b) => a + b, 0);
-            const percent = Math.round((dataset[0] / total) * 100) + '%';
 
-            ctx.save();
-            ctx.font = 'bold 16px sans-serif';
-            ctx.fillStyle = '';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(percent, width / 2, height / 2);
-            ctx.restore();
-        }
-    };
-
-    Chart.register(centerTextPlugin);
-
-    const chartOptions = {
-        cutout: '70%',
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            tooltip: { enabled: false },
-            legend: { display: false }
-        }
-    };
-
-    let finishedChart, remainingChart;
-
-    function renderCharts() {
-        const finishedPercent = {{ $finishedPercent ?? 0 }};
-        const remainingPercent = {{ $remainingPercent ?? 0 }};
-
-        if (finishedChart) finishedChart.destroy();
-        if (remainingChart) remainingChart.destroy();
-
-        finishedChart = new Chart(document.getElementById('finishedChart'), {
-            type: 'doughnut',
-            data: {
-                datasets: [{
-                    data: [finishedPercent, 100 - finishedPercent],
-                    backgroundColor: ['#1abc9c', '#eeeeee'],
-                    borderWidth: 7
-                }]
-            },
-            options: chartOptions,
-            plugins: [centerTextPlugin]
-        });
-
-        remainingChart = new Chart(document.getElementById('remainingChart'), {
-            type: 'doughnut',
-            data: {
-                datasets: [{
-                    data: [remainingPercent, 100 - remainingPercent],
-                    backgroundColor: ['#f1c40f', '#eeeeee'],
-                    borderWidth: 7
-                }]
-            },
-            options: chartOptions,
-            plugins: [centerTextPlugin]
-        });
-    }
-
-    // Render awal
-    renderCharts();
-
-    // Event tombol refresh
-    document.getElementById('refreshBtn').addEventListener('click', function () {
-        renderCharts(); // bisa ditambahkan fetch data terbaru via AJAX kalau mau
-    });
-</script>
 
 
 @include('admin.components.scripts')

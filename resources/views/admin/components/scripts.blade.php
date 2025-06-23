@@ -145,6 +145,32 @@ function loadNotifications() {
 loadNotifications();
 </script>
 
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const logContainer = document.getElementById('activityLogCollapse');
+
+        fetch("{{ url('/admin/activity/fetch-log') }}")
+            .then(response => response.json())
+            .then(data => {
+                logContainer.innerHTML = '';
+
+                if (!data.logs || data.logs.length === 0) {
+                    logContainer.innerHTML = '<li><small class="text-muted">Tidak ada log aktivitas</small></li>';
+                } else {
+                    data.logs.forEach(log => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `<small>${log.log_message}</small>`;
+                        logContainer.appendChild(li);
+                    });
+                }
+            })
+            .catch(error => {
+                logContainer.innerHTML = '<li><small class="text-danger">Gagal memuat data</small></li>';
+                console.error('Log fetch error:', error);
+            });
+    });
+</script>
+
 
 
 

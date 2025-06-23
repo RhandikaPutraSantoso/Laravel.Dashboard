@@ -19,9 +19,7 @@ Route::middleware('checklogin')->group(callback: function () {
     Route::get('log-viewers', [\Rap2hpoutre\LaravelLogViewer\LogViewerController::class, 'index']);
     Route::get('/get-notifications', [App\Http\Controllers\dashboardController::class, 'fetch']);
     Route::post('/admin/activity/send-email/{id}', [dashboardController::class, 'sendEmail'])->name('admin.activity.sendEmail');
-
-
-
+    Route::get('/admin/activity/fetch-log', [DashboardController::class, 'fetchActivityLog']);
     
 
     Route::get('/admin/activity/report', [DashboardController::class, 'activityReport'])->name('admin.activity.report');

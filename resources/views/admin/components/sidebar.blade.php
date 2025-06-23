@@ -1,8 +1,70 @@
 <style>
-.sidebarbottom{
-  position: absolute;
-  top:300px
+ /* Container utama log */
+#activityLogCollapse {
+    list-style: none;
+    padding-left: 10px;
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
 }
+
+/* Setiap item log */
+#activityLogCollapse li {
+    position: relative;
+    margin-bottom: 20px;
+    margin-top: 5px;
+    padding-left: 15px;
+    color: #aaa;
+    font-size: 13.5px;
+    line-height: 1.5;
+}
+
+/* Bullet/titik log */
+#activityLogCollapse li::before {
+    content: "";
+    position: absolute;
+    left: -7px;
+    top: 2px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: #ccc;
+    border: 2px solid white;
+    box-shadow: 0 0 0 2px #ffffff;
+}
+
+/* Log terbaru di atas */
+#activityLogCollapse li:first-child {
+    font-weight: 600;
+    color: inherit;
+}
+
+#activityLogCollapse li:first-child::before {
+    background-color: #00b5ad;
+}
+#activityLogCollapse li:hover {
+    color: #fff;
+    
+}
+
+
+/* Teks isi log */
+#activityLogCollapse li small {
+    display: block;
+    color: inherit;
+}
+
+/* Log kosong */
+#activityLogCollapse .text-muted {
+    color: #999 !important;
+    font-style: italic;
+}
+
+/* Gagal load log */
+#activityLogCollapse .text-danger {
+    color: #e74c3c !important;
+    font-weight: 500;
+}
+
 
 
   #notif-items {
@@ -195,50 +257,28 @@
 
               </ul>
             </li>
-
+            <li class="nav-header hidden-folded">
+              <small class="text-muted">Service</small>
+            </li>
             <li>
-              {{-- Compare the current URL with '/index' or pass a variable from the controller --}}
+              <a data-bs-toggle="collapse" href="#activityLogCollapse" aria-expanded="false">
+                  <span class="nav-caret"><i class="fa fa-caret-down"></i></span>
+                  <span class="nav-icon"><i class="material-icons">&#xe152;</i></span>
+                  <span class="nav-text">Service Activity Log</span>
+              </a>
+              <ul class="nav-sub collapse show" id="activityLogCollapse" style="padding-left: 20px;">
+                  <li><small class="text-muted" id="activityLogLoading">Memuat aktivitas...</small></li>
+              </ul>
+            </li>
+
+            <li >
               <a href="{{ Route('logout') }}" class="{{ Request::is('index') ? 'active' : '' }}">
                 <span class="nav-icon">
-                  <i class="material-icons">&#xe566;
-                    <span ui-include="'{{ asset('layouts/assets/images/i_0.svg') }}'"></span>
-                  </i>
+                  <i class="material-icons">&#xe879;</i>
                 </span>
                 <span class="nav-text">LogOut</span>
               </a>
             </li>
-
-            <li class="sidebarbottom" >
-              {{-- Check if any sub-item is active to keep the parent expanded --}}
-              <a class=" ? 'active' : '' }}">
-
-                <span class="nav-caret">
-                  <i class="fa fa-caret-down"></i>
-                </span>
-                <span class="nav-label">
-                  
-                </span>
-                <span class="nav-icon">
-                  <i class="material-icons">&#xe8b8;
-                    <span ui-include="'{{ asset('layouts/assets/images/i_1.svg') }}'"></span>
-                  </i>
-                </span>
-                <span class="nav-text">service Activity log</span>
-              </a>
-              <ul class="nav-sub">
-                
-                <li></li>
-                <li></li>
-                <li></li>
-                
-                
-
-
-
-              </ul>
-            </li>
-
-
 
 
           </ul>

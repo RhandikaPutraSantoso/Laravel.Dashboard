@@ -20,11 +20,36 @@
     <h2>STATUS FOR SAP</h2>
     <div class="padding">
         @if(session('success'))
-    <div class="alert alert-success">{{ session('success') }}</div>
+    <div class="alert alert-success alert-dismissible fade show" role="alert" id="success-alert">
+        {{ session('success') }}
+    </div>
 @endif
+
 @if(session('error'))
-    <div class="alert alert-danger">{{ session('error') }}</div>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert" id="error-alert">
+        {{ session('error') }}
+    </div>
 @endif
+
+<script>
+    setTimeout(function() {
+        var successAlert = document.getElementById('success-alert');
+        var errorAlert = document.getElementById('error-alert');
+
+        if (successAlert) {
+            successAlert.style.transition = "opacity 0.5s ease-out";
+            successAlert.style.opacity = 0;
+            setTimeout(() => successAlert.remove(), 500);
+        }
+
+        if (errorAlert) {
+            errorAlert.style.transition = "opacity 0.5s ease-out";
+            errorAlert.style.opacity = 0;
+            setTimeout(() => errorAlert.remove(), 500);
+        }
+    }, 5000); // 5 detik
+</script>
+
         <div class="box">
             <div class="box-header">
                 <h2>Aktivitas Perusahaan</h2>
@@ -42,6 +67,7 @@
                             <th>Subject</th>
                             <th>Foto</th>
                             <th>Deskripsi</th>
+                            <th>Deskripsi Admin</th>
                             <th>Tanggal Proses</th>
                             <th>Status</th>
                             <th>Aksi</th>
@@ -64,6 +90,7 @@
                                 @endif
                             </td>
                             <td>{!! nl2br(e($activity['DESKRIPSI'])) !!}</td>
+                            <td>{!! nl2br(e($activity['DESKRIPSI_ADMIN'])) !!}</td>
                             <td>{{ $activity['TGL_STATUS'] }}</td>
                             <td>{{ $activity['NM_STATUS'] }}</td>
                             

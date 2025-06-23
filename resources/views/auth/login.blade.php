@@ -26,8 +26,8 @@
             <div class="form-group">
                 <label for="type">Login As</label>
                 <select name="type" id="type" class="form-control" onchange="toggleFields()">
-                    <option value="admin">Admin</option>
                     <option value="user">User</option>
+                    <option value="admin">Admin</option>
                 </select>
             </div>
 

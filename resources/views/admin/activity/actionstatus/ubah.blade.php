@@ -91,6 +91,13 @@
           <small class="text-danger">{{ $message }}</small>
         @enderror
       </div>
+      <div class="form-group">
+        <label>Deskripsi Admin</label>
+        <textarea name="deskripsi_admin" class="form-control" rows="8">{{ old('deskripsi_admin', $activity['DESKRIPSI_ADMIN']) }}</textarea>
+        @error('deskripsi_admin')
+          <small class="text-danger">{{ $message }}</small>
+        @enderror
+      </div>
 
       <div class="form-group">
         <label>Status Level</label>

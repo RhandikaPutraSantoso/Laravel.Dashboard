@@ -81,7 +81,7 @@
         </tr>
         <tr>
             <td class="label">Penjelasan Admin</td>
-            <td>: {!! nl2br(e($activity['KOMENTAR'] ?? '-')) !!}</td>
+            <td>: {!! nl2br(e($activity['DESKRIPSI_ADMIN'] ?? '-')) !!}</td>
         </tr>
         <tr>
             <td class="label">Tanggal</td>

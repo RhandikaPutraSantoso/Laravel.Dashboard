@@ -8,11 +8,12 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\ActivityReportMail;
 use Illuminate\Support\Facades\Log;
-
 use Exception;
+
 use Carbon\Carbon;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Session;
+use Termwind\Components\Dd;
 
 
 
@@ -61,11 +62,47 @@ class dashboardController extends Controller
     ]);
 }
 
+public function fetchActivityLog()
+{
+    try {
+        $koneksi = HanaConnection::getConnection();
 
+        $query = "
+            SELECT 
+                A.ID_ACTIVITY, 
+                A.TIKET,
+                A.NM_USER, 
+                A.TGL_ACTIVITY
+            FROM SBO_SUPPORT_SAPHANA.ACTIVITY A
+            WHERE A.ID_ACTIVITY IS NOT NULL AND A.TGL_ACTIVITY IS NOT NULL
+            ORDER BY A.TGL_ACTIVITY DESC
+            LIMIT 5
+        ";
 
+        $data = $koneksi->query($query)->fetchAll(\PDO::FETCH_ASSOC);
 
+        $logs = [];
 
+        foreach ($data as $row) {
+            $waktu = date('d-m-Y H:i', strtotime($row['TGL_ACTIVITY']));
+            $logs[] = [
+                'log_message' => "{$waktu}
+                {$row['NM_USER']} telah membuat {$row['TIKET']}  "
+            ];
+        }
 
+        return response()->json([
+            'log_count' => count($logs),
+            'logs' => $logs
+        ]);
+
+    } catch (Exception $e) {
+        return response()->json([
+            'logs' => [],
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
 
 // This method is used to display the dashboard page
    public function index(Request $request)
@@ -719,7 +756,8 @@ public function sendEmail($id)
                         'subject' => 'required|max:255',
                         'deskripsi' => 'required',
                         'ID_STATUS' => 'required|numeric',
-                        'foto_baru.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048' // For new photos
+                        'foto_baru.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',// For new photos
+                        'deskripsi_admin' => 'required'
                     ]);
 
                     $TGL_STATUS = date("Y-m-d H:i:s");
@@ -733,7 +771,8 @@ public function sendEmail($id)
                             SUBJECT = ?,
                             DESKRIPSI = ?,
                             ID_STATUS = ?,
-                            TGL_STATUS = ?
+                            TGL_STATUS = ?,
+                            DESKRIPSI_ADMIN = ?
                         WHERE ID_ACTIVITY = ?
                     ");
 
@@ -745,6 +784,7 @@ public function sendEmail($id)
                         $request->deskripsi,                        
                         $request->ID_STATUS,
                         $TGL_STATUS,
+                        $request->deskripsi_admin, 
                         $id
                     ]);
 
