@@ -5,16 +5,11 @@
     <link rel="stylesheet" href="{{ asset('layouts/css/login.css') }}">
     <link rel="shortcut icon" sizes="196x196" href="{{ asset('layouts/assets/images/logo2.png') }}">
   <link rel="apple-touch-icon" href="{{ asset('layouts/assets/images/logo2.png') }}">
-    <link rel="stylesheet" href="{{ asset('layouts/css/bootstrap.min.css') }}">
+    
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Poppins', sans-serif; background-color: #005b96; display: flex; justify-content: center; align-items: center; height: 100vh; }
-        .login-box { background: #fff; padding: 30px; border-radius: 12px; width: 400px; }
-        h2 { text-align: center; margin-bottom: 20px; }
-        .form-group { margin-bottom: 15px; }
-    </style>
+    
 </head>
 <body>
     <div class="login-box">
@@ -45,12 +40,12 @@
 
             <div class="form-group">
                 <label>Username</label>
-                <input type="text" name="username" class="form-control" required>
+                <input type="text" name="username" class="form-control" placeholder="Username" required>
             </div>
 
             <div class="form-group">
                 <label>Password</label>
-                <input type="password" name="password" class="form-control" required>
+                <input type="password" name="password" class="form-control" placeholder="Password" required>
             </div>
 
             <button type="submit" class="btn btn-primary w-100">Login</button>

@@ -1,48 +1,133 @@
+/* Root Variables */
+:root {
+  --primary-color: #3498db;
+  --primary-hover: #2980b9;
+  --text-color: #2c3e50;
+  --background-color: #ffffff;
+  --shadow-color: rgba(0, 0, 0, 0.2);
+  --font-family: 'Poppins', sans-serif;
+}
+
+/* Base Styles */
 body {
-    font-family: 'Poppins', sans-serif;
-    background: linear-gradient(135deg, #2c3e50, #3498db);
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  font-family: var(--font-family);
+  background: url('../assets/images/background.png') no-repeat center center / cover;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+  overflow: hidden;
+}
+
+/* Animation */
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
   }
-  
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Login Box */
+.login-box {
+  background: rgba(255, 255, 255, 0.527);
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px var(--shadow-color);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  width: 100%;
+  max-width: 400px;
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.login-box h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+/* Form Elements */
+.form-group {
+  margin-bottom: 20px;
+  position: relative;
+  justify-content: center;
+  align-items: center;
+}
+
+.form-group i {
+  position: absolute;
+  top: 50%;
+  left: 15px;
+  transform: translateY(-50%);
+  color: var(--primary-color); 
+}
+
+.form-control {
+  width: 97%;
+  padding: 10px 5px 10px 5px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.form-control:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 5px rgba(52, 152, 219, 0.4);
+  outline: none;
+}
+
+/* Checkbox & Inline Text */
+.checkbox-inline {
+  font-size: 13px;
+  color: #555;
+  display: inline-block;
+  margin-top: 10px;
+}
+
+/* Button */
+.btn-primary {
+  width: 100%;
+  padding: 12px;
+  font-size: 15px;
+  border-radius: 8px;
+  background-color: var(--primary-color);
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-hover);
+}
+
+/* Alert Message */
+.alert {
+  margin-top: 15px;
+  text-align: center;
+  font-size: 14px;
+  padding: 10px;
+  border-radius: 6px;
+  background-color: #eaf6fd;
+  color: #2c80b4;
+}
+
+@media (max-width: 480px) {
   .login-box {
-    background: white;
-    padding: 40px;
-    border-radius: 12px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-    width: 100%;
-    max-width: 400px;
+    padding: 30px 20px;
+    border-radius: 8px;
+    margin: 0 10px;
   }
-  
-  .login-box h2 {
-    text-align: center;
-    margin-bottom: 25px;
-    font-weight: bold;
-    color: #2c3e50;
-  }
-  
+
   .form-control {
-    border-radius: 8px;
-  }
-  
-  .btn-primary {
-    width: 100%;
-    border-radius: 8px;
-    padding: 10px;
-  }
-  
-  .form-group i {
-    color: #3498db;
-  }
-  
-  .checkbox-inline {
     font-size: 13px;
+    padding: 10px 5px 10px 5px
   }
-  
-  .alert {
-    margin-top: 15px;
-    text-align: center;
-  }
-  
+}

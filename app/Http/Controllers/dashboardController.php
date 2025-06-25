@@ -84,7 +84,7 @@ public function fetchActivityLog()
         $logs = [];
 
         foreach ($data as $row) {
-            $waktu = date('d-m-Y H:i', strtotime($row['TGL_ACTIVITY']));
+            $waktu = date('d-m-Y H:i:s', strtotime($row['TGL_ACTIVITY']));
             $logs[] = [
                 'log_message' => "{$waktu}
                 {$row['NM_USER']} telah membuat {$row['TIKET']}  "
@@ -215,20 +215,13 @@ public function sendEmail($id)
     }
 }
 
-
-
-
-
-
-
 // This method is used to display the activity report page
     public function activityReport()
     {
         if (!session('admin_sap')) {
            abort(404); // Activity not found
         }
-        $koneksi = HanaConnection::getConnection();;
-        
+        $koneksi = HanaConnection::getConnection();
 
         $sql = "
             SELECT 
@@ -312,7 +305,7 @@ public function sendEmail($id)
             'email' => 'cmnp@citra.co.id',
         ],
         'cmnpproper' => [
-            'alamat' => 'Jl. Properti Raya No. 12, Bekasi',
+            'alamat' => 'Jl. Yos Sudarso Kavling No.28 3, RT.3/RW.11, Sunter Jaya, Kec. Tj. Priok, Jkt Utara, Daerah Khusus Ibukota Jakarta 14350',
             'telepon' => '(021) 88888777',
             'email' => 'cs@cmnpproper.co.id',
         ],

@@ -63,9 +63,7 @@
   
   pointer-events: none;
 }
-
-
-
+  
 </style>
 
 </head>
@@ -75,10 +73,10 @@
       <div class="box">
         <div class="padding white">
           <div class="box">
-            
-            <h1>Selamat Datang di Administrator CMNP GROUP Official </h1>
-            <br>
 
+            <h1 style="text-align: center">Selamat Datang di Administrator CMNP GROUP Official </h1>
+            <br>
+            <h2 style="text-align: center">Dashboard</h2>
             <!-- Form Filter -->
             <form method="GET" class="m-b-lg white">
                 <label for="bulan">Bulan:</label>

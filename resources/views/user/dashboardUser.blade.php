@@ -17,7 +17,7 @@
     @include('user.components.sidebar')
 <div class="padding">
     
-    <h1>Selamat Datang di User SAP </h1>
+    <h1 style="text-align: center">Selamat Datang di Dashboard User SAP </h1>
     <br>
 
     <!-- Form Filter -->
