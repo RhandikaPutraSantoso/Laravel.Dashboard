@@ -56,8 +56,7 @@
               {{-- Compare the current URL with '/index' or pass a variable from the controller --}}
               <a href="{{ Route('logout') }}" class="{{ Request::is('index') ? 'active' : '' }}">
                 <span class="nav-icon">
-                  <i class="material-icons">&#xe566;
-                    <span ui-include="'{{ asset('layouts/assets/images/i_0.svg') }}'"></span>
+                  <i class="material-icons">&#xe879;
                   </i>
                 </span>
                 <span class="nav-text">LogOut</span>

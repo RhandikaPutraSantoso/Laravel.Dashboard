@@ -14,18 +14,14 @@ use Termwind\Components\Dd;
 class userController extends Controller
 {
 // This method is used to display the dashboard page
-    public function index(Request $request)
-{   
-    
+   public function index(Request $request)
+{
     if (!Session::has('user_sap') || !Session::has('company')) {
     abort(404); 
 }
-
-
-
     $koneksi = HanaConnection::getConnection();
 
-    // Filter WHERE
+    // Filter WHERE untuk chart dan report
     $where = "WHERE 1=1";
     if ($request->bulan) {
         $where .= " AND MONTH(TGL_ACTIVITY) = " . (int) $request->bulan;
@@ -34,7 +30,7 @@ class userController extends Controller
         $where .= " AND YEAR(TGL_ACTIVITY) = " . (int) $request->tahun;
     }
 
-    // Data untuk chart
+// chart company
     $chartQuery = "
         SELECT COMPANY_SAP.NM_COMPANY, COUNT(*) AS JUMLAH 
         FROM SBO_SUPPORT_SAPHANA.ACTIVITY
@@ -44,16 +40,50 @@ class userController extends Controller
     ";
     $dataChart = $koneksi->query($chartQuery)->fetchAll();
 
-    // Data tabel
+// tabel aktivitas
     $tabelQuery = "
         SELECT * 
         FROM SBO_SUPPORT_SAPHANA.ACTIVITY 
         LEFT JOIN SBO_SUPPORT_SAPHANA.COMPANY_SAP ON ACTIVITY.ID_COMPANY = COMPANY_SAP.ID_COMPANY
-        $where
     ";
     $aktivitas = $koneksi->query($tabelQuery)->fetchAll();
 
-    return view('user.dashboardUser', compact('dataChart', 'aktivitas'));
+//    task report => finish & remaining
+    $finishedQuery = "
+        SELECT COUNT(*) AS JUMLAH FROM (
+        SELECT ID_ACTIVITY, TIKET, TGL_ACTIVITY AS TANGGAL FROM SBO_SUPPORT_SAPHANA.ACTIVITY WHERE ID_DIFFICULT IS NOT NULL
+        UNION ALL
+        SELECT ID_ACTIVITY, TIKET, TGL_STATUS AS TANGGAL FROM SBO_SUPPORT_SAPHANA.ACTIVITY WHERE ID_STATUS IS NOT NULL
+        UNION ALL
+        SELECT ID_ACTIVITY, TIKET, TGL_SOLVED AS TANGGAL FROM SBO_SUPPORT_SAPHANA.ACTIVITY WHERE TGL_SOLVED IS NOT NULL
+    ) AS gabungan
+    ";
+    $finished = $koneksi->query($finishedQuery)->fetch()['JUMLAH'];
+
+    $remainingQuery = "
+        SELECT COUNT(*) AS JUMLAH FROM (
+        SELECT ID_ACTIVITY, TIKET, TGL_ACTIVITY AS TANGGAL FROM SBO_SUPPORT_SAPHANA.ACTIVITY WHERE ID_DIFFICULT IS NULL
+        UNION ALL
+        SELECT ID_ACTIVITY, TIKET, TGL_STATUS AS TANGGAL FROM SBO_SUPPORT_SAPHANA.ACTIVITY WHERE ID_STATUS IS NULL
+        UNION ALL
+        SELECT ID_ACTIVITY, TIKET, TGL_SOLVED AS TANGGAL FROM SBO_SUPPORT_SAPHANA.ACTIVITY WHERE TGL_SOLVED IS NULL
+    ) AS gabungan
+    ";
+    $remaining = $koneksi->query($remainingQuery)->fetch()['JUMLAH'];
+
+    $total = $finished + $remaining;
+    $finishedPercent = $total > 0 ? round(($finished / $total) * 100) : 0;
+    $remainingPercent = 100 - $finishedPercent;
+
+    // Kirim semua ke view
+    return view('user.dashboardUser', compact(
+        'dataChart',
+        'aktivitas',
+        'finished',
+        'remaining',
+        'finishedPercent',
+        'remainingPercent'
+    ));
 }
 // This method is used to display the activity report page
     public function activityReport()

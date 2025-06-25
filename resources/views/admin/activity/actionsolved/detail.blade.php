@@ -16,7 +16,7 @@
     @include('admin.components.sidebar')
 <div class="padding">
  <!-- ############ PAGE START-->
-<table class="table table-bordered">
+<table class="table table-striped b-t b-b dataTable no-footer display-inline">
     <tr>
         <th>Nama Company</th>
         <td>{{ $activity['NM_COMPANY'] ?? '-' }}</td>

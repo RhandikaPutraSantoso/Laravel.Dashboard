@@ -5678,3 +5678,19 @@ textarea.md-input {
 .fade-in-down.ng-leave {
   -webkit-animation: fadeOutDown 0.5s;
   animation: fadeOutDown 0.5s; }
+
+  /* Badges */
+.badge {
+  display: inline-block;
+  padding: 0.35em 0.65em;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #fff;
+  border-radius: 0.35rem;
+}
+.bg-danger    { background-color: #e74c3c; }   /* Error / Gagal */
+.bg-warning   { background-color: #f39c12; }   /* Sedang diproses */
+.bg-primary   { background-color: #3498db; }   /* Info / Default */
+.bg-success   { background-color: #2ecc71; }   /* Berhasil / Solved */
+.bg-secondary { background-color: #95a5a6; }   /* Netral */
+.bg-dark      { background-color: #2c3e50; }   /* Untuk teks gelap */

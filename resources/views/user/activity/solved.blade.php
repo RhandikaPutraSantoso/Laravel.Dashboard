@@ -28,6 +28,7 @@
                         
                         <tr>
                             <th>No</th>
+                            <th>Status</th>
                             <th>Tiket</th>
                             <th>Company</th>
                             <th>Email</th>
@@ -36,7 +37,6 @@
                             <th>Foto</th>
                             <th>Deskripsi Solved</th>
                             <th>Tanggal Solaved</th>
-                            <th>Status</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -44,6 +44,7 @@
                         @foreach($activities as $index => $activity)
                         <tr>
                             <td>{{ $index + 1 }}</td>
+                            <td>{{ $activity['NM_STATUS'] }}</td>
                             <td>{{ $activity['TIKET'] }}</td>
                             <td>{{ $activity['NM_COMPANY'] }}</td>
                             <td>{{ $activity['MAIL_COMPANY'] }}</td>
@@ -58,7 +59,6 @@
                             </td>
                             <td>{!! nl2br(e($activity['DESKRIPSI_SOLVED'])) !!}</td>
                             <td>{{ $activity['TGL_SOLVED'] }}</td>
-                            <td>{{ $activity['NM_STATUS'] }}</td>
                             
                             <td>
                                 <div class="btn-group-vertical">
@@ -84,5 +84,87 @@
 @include('user.components.scripts')
 
 @include('user.components.themes')
+<script>
+$(document).ready(function () {
+  var table = $('#table').DataTable({
+    responsive: true,
+    order: [[0, 'desc']],
+    dom:
+      "<'row mb-3'<'col-md-3'l><'col-md-6 text-center'B><'col-md-3'f>>" +
+      "<'row'<'col-md-12'tr>>" +
+      "<'row mt-2'<'col-md-5'i><'col-md-7'p>>",
+    buttons: [
+      { extend: 'csv', className: 'btn btn-outline-info btn-sm me-1' },
+      { extend: 'excel', className: 'btn btn-outline-success btn-sm me-1' },
+      { extend: 'pdf', className: 'btn btn-outline-danger btn-sm me-1' },
+      { extend: 'print', className: 'btn btn-outline-primary btn-sm' }
+    ],
+    lengthMenu: [
+      [5, 10, 25, 50, 100, -1],
+      [5, 10, 25, 50, 100, "All"]
+    ],
+    language: {
+      loadingRecords: "Loading...",
+      zeroRecords: "Data tidak ditemukan",
+      info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+      infoEmpty: "Menampilkan 0 sampai 0 dari 0 data",
+      search: "Search:",
+      paginate: {
+        next: "Next",
+        previous: "Previous"
+      }
+    },
+    createdRow: function (row, data, dataIndex) {
+      var statusCell = $('td:eq(1)', row);
+        // Format status cell with badge
+      if (!statusCell.length) return; // Skip if no status cell found
+        statusCell.addClass('text-center');
+        statusCell.css('white-space', 'nowrap'); // Prevent text wrapping
+        statusCell.css('font-weight', 'bold'); // Make text bold
+        statusCell.css('text-transform', 'capitalize'); // Capitalize first letter of each word
+        statusCell.css('font-size', '0.9em'); // Adjust font size for better readability
+        if (statusCell.text().trim() === '') return; // Skip if status is empty
+      var status = statusCell.text().trim();
+      let badgeClass = '';
+
+      switch (status) {
+        case 'Not Continue':
+          badgeClass = 'bg-danger';
+          break;
+        case 'Hard':
+          badgeClass = 'bg-warning text-dark';
+          break;
+        case 'Basic':
+          badgeClass = 'bg-primary';
+          break;
+        case 'Expert':
+          badgeClass = 'bg-success';
+          break;
+        case 'Proses':
+          badgeClass = 'bg-success';
+          break;
+        case 'Proses MIS':
+          badgeClass = 'bg-success';
+          break;
+        case 'Not Proses Yet':
+          badgeClass = 'bg-danger';
+          break;
+        case 'Solved':
+          badgeClass = 'bg-warning text-dark';
+          break;
+        case 'Solved MIS':
+          badgeClass = 'bg-primary';
+          break;
+        default:
+          badgeClass = 'bg-secondary';
+      }
+
+      statusCell.html(`<span class="badge ${badgeClass}">${status}</span>`);
+    }
+  });
+
+  table.buttons().container().appendTo('#table_wrapper .col-md-6:eq(0)');
+});
+</script>
 </body>
 </html>

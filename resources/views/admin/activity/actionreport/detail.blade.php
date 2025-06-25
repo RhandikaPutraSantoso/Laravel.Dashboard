@@ -7,7 +7,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-barstyle" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Flatkit">
+  
   <meta name="mobile-web-app-capable" content="yes">
 
     @include('admin.components.css')
@@ -16,16 +16,17 @@
     @include('admin.components.sidebar')
     
 <div class="padding">
- <!-- ############ PAGE START-->
-<table class="table table-bordered">
-    <tr>
-        <th>Nama Company</th>
-        <td>{{ $activity['NM_COMPANY'] ?? '-' }}</td>
-    </tr>
-    <tr>
-        <th>Email Company</th>
-        <td>{{ $activity['MAIL_COMPANY'] ?? '-' }}</td>
-    </tr>
+    
+    <!-- ############ PAGE START-->
+    <table class=" table table-striped b-t b-b dataTable no-footer display-inline">
+        <tr>
+            <th>Nama Company</th>
+            <td>{{ $activity['NM_COMPANY'] ?? '-' }}</td>
+        </tr>
+        <tr>
+            <th>Email Company</th>
+            <td>{{ $activity['MAIL_COMPANY'] ?? '-' }}</td>
+        </tr>
     <tr>
         <th>Nama User</th>
         <td>{{ $activity['NM_USER'] ?? '-' }}</td>
@@ -67,13 +68,15 @@
         <td>{{ $activity['NM_DIFFICULT'] ?? '-' }}</td>
     </tr>
 </table>
-
 <a href="{{ route('admin.activity.report') }}" class="btn btn-primary">Kembali</a>
+
 
 
   <!-- ############ PAGE END-->
    
   </div>
+  
+
 @include('admin.components.scripts')
 
 @include('admin.components.themes')

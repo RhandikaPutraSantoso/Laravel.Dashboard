@@ -117,7 +117,10 @@
 
       <button class="btn btn-primary" name="ubah" >Ubah</button>
     </form>
+    <br>
+
   </div>
+  
 
 @include('admin.components.scripts')
 
