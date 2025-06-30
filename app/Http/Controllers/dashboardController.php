@@ -84,10 +84,10 @@ public function fetchActivityLog()
         $logs = [];
 
         foreach ($data as $row) {
-            $waktu = date('d-m-Y H:i:s', strtotime($row['TGL_ACTIVITY']));
+            $waktu = $row['TGL_ACTIVITY'];
             $logs[] = [
-                'log_message' => "{$waktu}
-                {$row['NM_USER']} telah membuat {$row['TIKET']}  "
+                'log_message' => "{$row['NM_USER']} membuat tiket <strong>{$row['TIKET']}</strong>",
+                'log_time' => $waktu
             ];
         }
 
@@ -103,6 +103,7 @@ public function fetchActivityLog()
         ], 500);
     }
 }
+
 
 // This method is used to display the dashboard page
    public function index(Request $request)

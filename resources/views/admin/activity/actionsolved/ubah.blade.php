@@ -84,7 +84,15 @@
       </div>
 
       <div class="form-group">
-        <label>Deskripsi</label>
+        <label>Deskripsi </label>
+        <textarea name="deskripsi" class="form-control" rows="8">{{ old('deskripsi', $activity['DESKRIPSI']) }}</textarea>
+        @error('deskripsi')
+          <small class="text-danger">{{ $message }}</small>
+        @enderror
+      </div>
+
+      <div class="form-group">
+        <label>Deskripsi Solved</label>
         <textarea name="deskripsi" class="form-control" rows="8">{{ old('deskripsi', $activity['DESKRIPSI_SOLVED']) }}</textarea>
         @error('deskripsi')
           <small class="text-danger">{{ $message }}</small>

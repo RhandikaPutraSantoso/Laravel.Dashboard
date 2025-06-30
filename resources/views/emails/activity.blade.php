@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+
     <meta charset="UTF-8">
     <title>Laporan Aktivitas SAP</title>
     <style>
@@ -102,7 +104,7 @@
     @endif
 
     <div class="footer">
-        Email ini dikirim secara otomatis oleh sistem SAP Aktivitas.
+        Email ini dikirim secara otomatis oleh sistem SAP .
     </div>
 </div>
 </body>

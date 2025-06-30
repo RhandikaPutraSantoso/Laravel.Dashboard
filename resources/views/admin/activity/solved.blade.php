@@ -65,6 +65,7 @@
                             <th>Email</th>
                             <th>Username</th>
                             <th>Subject</th>
+                            <th>Deskripsi</th>
                             <th>Foto</th>
                             <th>Deskripsi Solved</th>
                             <th>Tanggal Solaved</th>
@@ -82,12 +83,20 @@
                             <td>{{ $activity['NM_USER'] }}</td>
                             <td>{{ $activity['SUBJECT'] }}</td>
                             <td>
+                                @if ($activity['DESKRIPSI'])
+                                    {!! nl2br(e($activity['DESKRIPSI'])) !!}
+                                @else
+                                    <small class="text-muted">No description</small>
+                                @endif
+                            </td>
+                            <td>
                                 @if ($activity['FOTO'])
                                     <img src="{{ asset('storage/uploads/' . $activity['FOTO']) }}" alt="Foto" width="100" class="rounded">
                                 @else
                                     <small class="text-muted">No image</small>
                                 @endif
                             </td>
+                            
                             <td>{!! nl2br(e($activity['DESKRIPSI_SOLVED'])) !!}</td>
                             <td>{{ $activity['TGL_SOLVED'] }}</td>
                             
@@ -162,36 +171,40 @@ $(document).ready(function () {
       let badgeClass = '';
 
       switch (status) {
-        case 'Not Continue':
-          badgeClass = 'bg-danger';
-          break;
-        case 'Hard':
-          badgeClass = 'bg-warning text-dark';
-          break;
-        case 'Basic':
-          badgeClass = 'bg-primary';
-          break;
-        case 'Expert':
-          badgeClass = 'bg-success';
-          break;
-        case 'Proses':
-          badgeClass = 'bg-success';
-          break;
-        case 'Proses MIS':
-          badgeClass = 'bg-success';
-          break;
-        case 'Not Proses Yet':
-          badgeClass = 'bg-danger';
-          break;
-        case 'Solved':
-          badgeClass = 'bg-warning text-dark';
-          break;
-        case 'Solved MIS':
-          badgeClass = 'bg-primary';
-          break;
-        default:
-          badgeClass = 'bg-secondary';
-      }
+  case 'Not Continue':
+  case 'Not Proses Yet':
+    badgeClass = 'bg-danger';
+    break;
+
+  case 'Hard':
+    badgeClass = 'bg-warning text-dark'; // Kuning
+    break;
+
+  case 'Basic':
+    badgeClass = 'bg-primary'; // Biru
+    break;
+
+  case 'Expert':
+    badgeClass = 'bg-dark text-white'; // Tambahan
+    break;
+
+  case 'Proses':
+  case 'Proses MIS':
+    badgeClass = 'bg-warning text-dark'; // Kuning proses
+    break;
+
+  case 'Solved':
+    badgeClass = 'bg-success text-white'; // Hijau solved
+    break;
+
+  case 'Solved MIS':
+    badgeClass = 'bg-success text-white'; // Hijau juga
+    break;
+
+  default:
+    badgeClass = 'bg-secondary';
+}
+
 
       statusCell.html(`<span class="badge ${badgeClass}">${status}</span>`);
     }

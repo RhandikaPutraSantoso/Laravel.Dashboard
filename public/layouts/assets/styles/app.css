@@ -98,8 +98,8 @@ sup {
   white-space: nowrap;
   vertical-align: baseline;
   font-weight: bold;
-  background-color: #b8b8b8;
-  color: #fff;
+  background-color: inherit;
+  color: inherit;
   border-radius: .2rem; }
   .label.no-bg {
     background-color: transparent;
@@ -125,7 +125,7 @@ sup {
 
 .list-group-item.active > .label,
 .nav-pills > .active > a > .label {
-  color: rgba(0, 0, 0, 0.87); }
+  color: inherit; }
 
 .btn .label {
   position: relative;
@@ -5694,3 +5694,34 @@ textarea.md-input {
 .bg-success   { background-color: #2ecc71; }   /* Berhasil / Solved */
 .bg-secondary { background-color: #95a5a6; }   /* Netral */
 .bg-dark      { background-color: #2c3e50; }   /* Untuk teks gelap */
+
+
+/* Form Filter */
+  .form-filter {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+    background-color: inherit;
+    border: inherit;
+}
+
+.form-label {
+    color: inherit;
+    font-weight: bold;
+    margin-right: 5px;
+}
+
+.form-select {
+    background-color:  inherit;
+    color: inherit;
+    border: 1px solid inherit;
+    border-radius: 4px;
+    padding: 5px 10px;
+}
+
+.form-select option {
+    color: inherit;
+    background-color: inherit;
+}

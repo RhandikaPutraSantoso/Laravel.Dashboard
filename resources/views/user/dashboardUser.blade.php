@@ -9,13 +9,13 @@
     <meta name="apple-mobile-web-app-status-barstyle" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Flatkit">
     <meta name="mobile-web-app-capable" content="yes">
-    @include('admin.components.css')
+    @include('user.components.css')
     <style>
         #chartWrapper {
         position: relative;
         padding-top: 50px;
         padding-left: 10px;
-        width: 1000px;
+        width: auto;
         margin: 0 auto;
         color: var(--text-color);
     }
@@ -25,8 +25,9 @@
         top: 0;
         left: 50%;
         transform: translateX(-50%);
-        font-size: 20px;
+        font-size: 18px;
         font-weight: bold;
+        text-align: center;
         color: var(--text-color);
     }
 
@@ -35,7 +36,7 @@
         top: 50%;
         left: -50px;
         transform: translateY(-50%) rotate(-90deg);
-        font-size: 12px;
+        font-size: 13px;
         color: var(--text-color);
     }
 
@@ -90,18 +91,18 @@
     </style>
 </head>
 <body>
-    @include('admin.components.sidebar')
+    @include('user.components.sidebar')
     <div class="padding">
         <div class="box">
-            <div class="padding white">
+            <div class="padding ">
                 <div class="box">
-                    <h1 class="text-center">Selamat Datang di Administrator CMNP GROUP Official</h1>
+                    <h1 class="text-center">Selamat Datang di Dashboard User CMNP GROUP Official</h1>
                     <br>
                     <h2 class="text-center">Dashboard</h2>
                     <!-- Form Filter -->
-                    <form method="GET" class="m-b-lg white">
-                        <label for="bulan">Bulan:</label>
-                        <select name="bulan" class="display-inline">
+                    <form method="GET" class="form-filter" data-target="bg">
+                        <label for="bulan" class="form-label">Bulan:</label>
+                        <select name="bulan" class="form-select">
                             <option value="">Semua</option>
                             @for ($i = 1; $i <= 12; $i++)
                                 <option value="{{ $i }}" {{ request('bulan') == $i ? 'selected' : '' }}>
@@ -109,15 +110,18 @@
                                 </option>
                             @endfor
                         </select>
-                        <label for="tahun">Tahun:</label>
-                        <select name="tahun" class="display-inline">
+
+                        <label for="tahun" class="form-label">Tahun:</label>
+                        <select name="tahun" class="form-select">
                             <option value="">Semua</option>
                             @for ($y = date('Y'); $y >= date('Y') - 5; $y--)
                                 <option value="{{ $y }}" {{ request('tahun') == $y ? 'selected' : '' }}>{{ $y }}</option>
                             @endfor
                         </select>
+
                         <button type="submit" class="btn btn-primary">Filter</button>
                     </form>
+
                     <!-- CHART HTML -->
                         <div id="chartWrapper">
                             <div class="text-div-title">Aktivitas Perusahaan</div>
@@ -293,7 +297,7 @@
 
     function renderChart(chartLabels, chartData, colorList) {
         const ctx = document.getElementById('bar-chart').getContext('2d');
-        const textColor = getComputedStyle(document.body).getPropertyValue('--text-color') || '#ffffff';
+        const textColor = getComputedStyle(document.body).getPropertyValue('text-color') || '#777777';
 
         if (currentChart) currentChart.destroy();
 
@@ -377,7 +381,43 @@
     });
 </script>
 
-    @include('admin.components.scripts')
-    @include('admin.components.themes')
+    @include('user.components.scripts')
+    @include('user.components.themes')
+
+    <script>
+$(document).ready(function () {
+  var table = $('#table').DataTable({
+    responsive: true,
+    order: [[0, 'desc']],
+    dom:
+      "<'row mb-3'<'col-md-3'l><'col-md-6 text-center'B><'col-md-3'f>>" +
+      "<'row'<'col-md-12'tr>>" +
+      "<'row mt-2'<'col-md-5'i><'col-md-7'p>>",
+    buttons: [
+      { extend: 'csv', className: 'btn btn-outline-info btn-sm me-1' },
+      { extend: 'excel', className: 'btn btn-outline-success btn-sm me-1' },
+      { extend: 'pdf', className: 'btn btn-outline-danger btn-sm me-1' },
+      { extend: 'print', className: 'btn btn-outline-primary btn-sm' }
+    ],
+    lengthMenu: [
+      [5, 10, 25, 50, 100, -1],
+      [5, 10, 25, 50, 100, "All"]
+    ],
+    language: {
+      loadingRecords: "Loading...",
+      zeroRecords: "Data tidak ditemukan",
+      info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+      infoEmpty: "Menampilkan 0 sampai 0 dari 0 data",
+      search: "Search:",
+      paginate: {
+        next: "Next",
+        previous: "Previous"
+      }
+    },
+});
+
+  table.buttons().container().appendTo('#table_wrapper .col-md-6:eq(0)');
+});
+</script>
 </body>
 </html>

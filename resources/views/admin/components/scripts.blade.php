@@ -5,7 +5,7 @@
 <script src="{{ asset('layouts/libs/jquery/underscore/underscore-min.js') }}"></script>
 <script src="{{ asset('layouts/libs/jquery/jQuery-Storage-API/jquery.storageapi.min.js') }}"></script>
 <script src="{{ asset('layouts/libs/jquery/PACE/pace.min.js') }}"></script>
-
+<script src="{{ asset('layouts/scripts/datatable.js') }}"></script>
 <script src="{{ asset('layouts/scripts/config.lazyload.js') }}"></script>
 <script src="{{ asset('layouts/scripts/palette.js') }}"></script>
 <script src="{{ asset('layouts/scripts/ui-load.js') }}"></script>
@@ -35,7 +35,7 @@
 <script src="{{ asset('layouts/DataTables/Buttons-1.5.6/js/buttons.flash.min.js') }}"></script>
 <script src="{{ asset('layouts/DataTables/Buttons-1.5.6/js/buttons.jqueryui.min.js') }}"></script>
 
-<script src="{{ asset('layouts/scripts/datatable.js') }}"></script>
+
 <script>
 function loadNotifications() {
   $.ajax({
@@ -90,29 +90,58 @@ loadNotifications();
 </script>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const logContainer = document.getElementById('activityLogCollapse');
+// Fungsi untuk ubah waktu jadi format "x menit lalu"
+function timeAgo(datetime) {
+  const now = new Date();
+  const then = new Date(datetime);
+  const seconds = Math.floor((now - then) / 1000);
 
-        fetch("{{ url('/admin/activity/fetch-log') }}")
-            .then(response => response.json())
-            .then(data => {
-                logContainer.innerHTML = '';
+  if (seconds < 60) return 'Baru saja';
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes} menit lalu`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours} jam lalu`;
+  const days = Math.floor(hours / 24);
+  return `${days} hari lalu`;
+}
 
-                if (!data.logs || data.logs.length === 0) {
-                    logContainer.innerHTML = '<li><small class="text-muted">Tidak ada log aktivitas</small></li>';
-                } else {
-                    data.logs.forEach(log => {
-                        const li = document.createElement('li');
-                        li.innerHTML = `<small>${log.log_message}</small>`;
-                        logContainer.appendChild(li);
-                    });
-                }
-            })
-            .catch(error => {
-                logContainer.innerHTML = '<li><small class="text-danger">Gagal memuat data</small></li>';
-                console.error('Log fetch error:', error);
-            });
-    });
+function loadActivityLogs() {
+  const $logContainer = $('#activityLogCollapse');
+  const $loadingItem = $('#activityLogLoading');
+
+  // Tampilkan loading jika belum ada
+  if ($loadingItem.length === 0) {
+    $logContainer.prepend('<li id="activityLogLoading"><small class="text-muted">Memuat aktivitas...</small></li>');
+  }
+
+  $.ajax({
+    url: '{{ url("/admin/activity/fetch-log") }}',
+    method: 'GET',
+    success: function (res) {
+      $('#activityLogLoading').remove();
+      $logContainer.find('li').remove(); // hapus semua log sebelumnya
+
+      if (!res.logs || res.logs.length === 0) {
+        $logContainer.append('<li><small class="text-muted">Tidak ada log aktivitas</small></li>');
+      } else {
+        res.logs.forEach(log => {
+          const waktu = timeAgo(log.log_time);
+          $logContainer.append(`<li><small>${log.log_message}<br><span class="text-muted">${waktu}</span></small></li>`);
+        });
+      }
+    },
+    error: function (xhr, status, error) {
+      $('#activityLogLoading').remove();
+      $logContainer.append('<li><small class="text-danger">Gagal memuat data aktivitas</small></li>');
+      console.error('Fetch error:', error);
+    }
+  });
+}
+
+// Load saat pertama kali
+document.addEventListener('DOMContentLoaded', function () {
+  loadActivityLogs();
+});
 </script>
 
 

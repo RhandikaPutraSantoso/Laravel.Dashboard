@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    
+
     <meta charset="utf-8" />
     <title>SAP HANA</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimal-ui" />
@@ -9,13 +11,14 @@
     <meta name="apple-mobile-web-app-status-barstyle" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Flatkit">
     <meta name="mobile-web-app-capable" content="yes">
+    
     @include('admin.components.css')
     <style>
-        #chartWrapper {
+    #chartWrapper {
         position: relative;
         padding-top: 50px;
         padding-left: 10px;
-        width: 1000px;
+        width: auto;
         margin: 0 auto;
         color: var(--text-color);
     }
@@ -27,6 +30,7 @@
         transform: translateX(-50%);
         font-size: 20px;
         font-weight: bold;
+        text-align: center;
         color: var(--text-color);
     }
 
@@ -88,20 +92,21 @@
             pointer-events: none;
         }
     </style>
+    
 </head>
 <body>
     @include('admin.components.sidebar')
     <div class="padding">
         <div class="box">
-            <div class="padding white">
+            <div class="padding ">
                 <div class="box">
                     <h1 class="text-center">Selamat Datang di Administrator CMNP GROUP Official</h1>
                     <br>
                     <h2 class="text-center">Dashboard</h2>
                     <!-- Form Filter -->
-                    <form method="GET" class="display-inline">
-                        <label for="bulan">Bulan:</label>
-                        <select name="bulan" class=" white display-inline">
+                    <form method="GET" class="form-filter" data-target="bg">
+                        <label for="bulan" class="form-label">Bulan:</label>
+                        <select name="bulan" class="form-select">
                             <option value="">Semua</option>
                             @for ($i = 1; $i <= 12; $i++)
                                 <option value="{{ $i }}" {{ request('bulan') == $i ? 'selected' : '' }}>
@@ -109,15 +114,18 @@
                                 </option>
                             @endfor
                         </select>
-                        <label for="tahun">Tahun:</label>
-                        <select name="tahun" class="white display-inline">
+
+                        <label for="tahun" class="form-label">Tahun:</label>
+                        <select name="tahun" class="form-select">
                             <option value="">Semua</option>
                             @for ($y = date('Y'); $y >= date('Y') - 5; $y--)
                                 <option value="{{ $y }}" {{ request('tahun') == $y ? 'selected' : '' }}>{{ $y }}</option>
                             @endfor
                         </select>
+
                         <button type="submit" class="btn btn-primary">Filter</button>
                     </form>
+
                     <!-- CHART HTML -->
                         <div id="chartWrapper">
                             <div class="text-div-title">Aktivitas Perusahaan</div>

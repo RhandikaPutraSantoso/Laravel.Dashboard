@@ -1,4 +1,6 @@
 <!-- ############ PAGE Start-->
+@vite(['resources/css/app.css', 'resources/js/app.js'])
+
   <div class="app" id="app">
 
 <div id="aside" class="app-aside modal fade folded md nav-expand">

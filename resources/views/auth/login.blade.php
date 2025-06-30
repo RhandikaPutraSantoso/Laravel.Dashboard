@@ -5,7 +5,7 @@
     <link rel="stylesheet" href="{{ asset('layouts/css/login.css') }}">
     <link rel="shortcut icon" sizes="196x196" href="{{ asset('layouts/assets/images/logo2.png') }}">
   <link rel="apple-touch-icon" href="{{ asset('layouts/assets/images/logo2.png') }}">
-    
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
