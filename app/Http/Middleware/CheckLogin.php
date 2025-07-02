@@ -11,7 +11,6 @@ class CheckLogin
         if (!session()->has('admin_sap') && !session()->has('user_sap')) {
             return redirect()->route('login')->withErrors(['auth' => 'Silakan login terlebih dahulu.']);
         }
-
         return $next($request);
     }
 }
