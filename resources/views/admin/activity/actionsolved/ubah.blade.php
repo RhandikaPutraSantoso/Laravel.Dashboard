@@ -13,6 +13,7 @@
 </head>
 <body>
     @include('admin.components.sidebar')
+    <div class="padding">
   <div class="padding">
     <h2>CHANGE ACTIVITY STATUS</h2>
 
@@ -119,6 +120,8 @@
     </form>
     
   </div>
+  </div>
+  <!-- ############ PAGE END-->
 
 @include('admin.components.scripts')
 @include('admin.components.themes')

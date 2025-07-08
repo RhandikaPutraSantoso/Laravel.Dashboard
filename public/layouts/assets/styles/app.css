@@ -1621,6 +1621,7 @@ body {
   right: 0;
   bottom: 0;
   z-index: 1;
+  padding: 0.5rem 1rem;
   margin: inherit; }
   .app-footer:not(.hide) ~ .app-body {
     padding-bottom: 3.125rem; }
@@ -1641,7 +1642,7 @@ body {
     display: block !important; }
     .app-aside,
     .app-aside .scroll {
-      width: 12.5rem; }
+      width: 14rem; }
     .app-aside.lg:not(.folded),
     .app-aside.lg:not(.folded) .scroll {
       width: 13.75rem; }

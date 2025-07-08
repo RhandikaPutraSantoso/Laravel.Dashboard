@@ -14,6 +14,7 @@
 </head>
 <body>
     @include('user.components.sidebar')
+    <div class="padding">
 <div class="padding">
  <!-- ############ PAGE START-->
 <table class="table table-bordered">
@@ -70,6 +71,7 @@
   <!-- ############ PAGE END-->
    
   </div>
+</div>
 @include('user.components.scripts')
 
 @include('user.components.themes')

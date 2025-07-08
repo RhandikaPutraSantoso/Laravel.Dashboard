@@ -16,6 +16,7 @@
 <body>
 @include('admin.components.sidebar')
 <div class="padding">
+<div class="padding">
 @if(session('success'))
     <div class="alert alert-success alert-dismissible fade show" role="alert" id="success-alert">
         {{ session('success') }}
@@ -118,6 +119,7 @@
             </div>
         </div>
     </div>
+</div>
 </div>
 
 

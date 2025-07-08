@@ -14,6 +14,7 @@
 </head>
 <body>
     @include('admin.components.sidebar')
+    <div class="padding">
     
 <div class="padding">
     
@@ -70,13 +71,10 @@
 </table>
 <a href="{{ route('admin.activity.report') }}" class="btn btn-primary">Kembali</a>
 
-
-
-  <!-- ############ PAGE END-->
-   
   </div>
+</div>
   
-
+<!-- ############ PAGE END-->
 @include('admin.components.scripts')
 
 @include('admin.components.themes')

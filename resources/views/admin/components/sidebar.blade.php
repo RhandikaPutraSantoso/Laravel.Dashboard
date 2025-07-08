@@ -250,6 +250,7 @@
               </a>
               <ul class="nav-sub">
                   <li><a href="{{ route('admin.pengaturan.email') }}" class="{{ Request::routeIs('admin.pengaturan.email') ? 'active' : '' }}">Email</a></li>
+                  <li><a href="{{ route('admin.pengaturan.company') }}" class="{{ Request::routeIs('admin.pengaturan.company  ') ? 'active' : '' }}">Company</a></li>
                   <li><a href="{{ route('admin.pengaturan.difficult') }}" class="{{ Request::routeIs('admin.pengaturan.difficult') ? 'active' : '' }}">Difficult Level</a></li>
                   <li><a href="{{ route('admin.pengaturan.status') }}" class="{{ Request::routeIs('admin.pengaturan.status') ? 'active' : '' }}">Status Level</a></li>
 
@@ -315,29 +316,30 @@
                         </div>
                       </li>
 
+              <li class="nav-item dropdown white">
+                    <a class="nav-link p-0 clear" href="#" data-toggle="dropdown">
+                        <span class="avatar w-32">
+                            <img src="{{ asset('layouts/assets/images/a0.jpg') }}" alt="...">
+                            <i class="on b-white bottom"></i>
+                        </span>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right white">
+                        <a class="dropdown-item" href="{{ route('password.edit') }}">
+                            <i class="material-icons mr-2">&#xe897;</i> Ganti Password
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="{{ Route('logout') }}" class="{{ Request::is('index') ? 'active' : '' }}">
+                            <i class="material-icons mr-2">&#xe879;</i> Logout
+                        </a>
+                    
+                    </div>
+                </li>
 
-
-
-
-              <li class="nav-item dropdown">
-                <a class="nav-link p-0 clear" href="#" data-toggle="dropdown">
-                  <span class="avatar w-32">
-                    <img src="{{ asset('layouts/assets/images/a0.jpg') }}" alt="...">
-                    <i class="on b-white bottom"></i>
-                  </span>
-                </a>
-                <div ui-include="'../views/blocks/dropdown.user.html'"></div>
-              </li>
-              <li class="nav-item hidden-md-up">
-                <a class="nav-link pl-2" data-toggle="collapse" data-target="#collapse">
-                  <i class="material-icons">&#xe5d4;</i>
-                </a>
-              </li>
             </ul>
             </div>
     </div>
   
-
+    
     <div class="app-footer">
       <div class="p-2 text-xs">
         <div class="pull-right text-muted py-1">
@@ -350,4 +352,5 @@
       </div>
     </div>
     <div ui-view class="app-body" id="view">
+    
       <!-- ############ PAGE END-->

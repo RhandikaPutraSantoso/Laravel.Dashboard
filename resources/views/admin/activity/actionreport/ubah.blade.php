@@ -15,6 +15,7 @@
 <body>
     @include('admin.components.sidebar')
   <div class="padding">
+    <div class="padding">
     <h2>CHANGE ACTIVITY</h2>
 
     <form method="POST" action="{{ route('admin.activity.actionreport.update', ['id' => $activity['ID_ACTIVITY']]) }}" enctype="multipart/form-data" >
@@ -119,6 +120,7 @@
     </form>
     <br>
 
+  </div>
   </div>
   
 

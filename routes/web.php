@@ -3,8 +3,8 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\dashboardController;
 use App\Http\Controllers\userController;
+use App\Http\Controllers\PasswordController;
 use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
-
 
 Route::get('/', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.post');
@@ -20,6 +20,11 @@ Route::middleware('checklogin')->group(callback: function () {
     Route::get('/get-notifications', [App\Http\Controllers\dashboardController::class, 'fetch']);
     Route::post('/admin/activity/send-email/{id}', [dashboardController::class, 'sendEmail'])->name('admin.activity.sendEmail');
     Route::get('/admin/activity/fetch-log', [DashboardController::class, 'fetchActivityLog']);
+
+Route::get('/change-password', [PasswordController::class, 'edit'])->name('password.edit');
+Route::post('/change-password', [PasswordController::class, 'update'])->name('password.update');
+
+
     
 
     Route::get('/admin/activity/report', [DashboardController::class, 'activityReport'])->name('admin.activity.report');
@@ -69,6 +74,12 @@ Route::middleware('checklogin')->group(callback: function () {
     Route::get('/admin/pengaturan/status/ubah/{id}', [DashboardController::class, 'statusEdit'])->name('admin.pengaturan.actionstatus.ubah');
     Route::put('/admin/pengaturan/status/ubah/{id}', [DashboardController::class, 'statusUpdate'])->name('admin.pengaturan.actionstatus.update');
 
+    Route::get('/admin/pengaturan/company', [DashboardController::class, 'company'])->name('admin.pengaturan.company');
+    Route::delete('/admin/pengaturan/company/delete/{id}', [DashboardController::class, 'companyDestroy'])->name('admin.pengaturan.company.destroy');
+    Route::get('admin/pengaturan/company/tambah', [DashboardController::class, 'companyTambah'])->name('admin.pengaturan.actioncompany.tambah');
+    Route::post('/admin/pengaturan/company/store', [DashboardController::class, 'companyStore'])->name('admin.pengaturan.company.store');
+    Route::get('/admin/pengaturan/company/ubah/{id}', [DashboardController::class, 'companyEdit'])->name('admin.pengaturan.actioncompany.ubah');
+    Route::put('/admin/pengaturan/company/ubah/{id}', [DashboardController::class, 'companyUpdate'])->name('admin.pengaturan.actioncompany.update');
 
 });
 
@@ -77,6 +88,16 @@ Route::get('user/dashboardUser', [ userController::class, 'index'])->middleware(
 
 // Grouped protected routes
 Route::middleware('checklogin')->group(function () {
+
+    Route::get('/admin/activity/timeline', [userController::class, 'getRecentActivityTimeline']);
+
+    Route::get('/change-password', [PasswordController::class, 'edit'])->name('password.edit');
+    Route::post('/change-password', [PasswordController::class, 'update'])->name('password.update');
+
+    Route::get('/user/profile/edit', [userController::class, 'profileEdit'])->name('user.profile.edit');
+    Route::post('/user/profile/update', [userController::class, 'profileUpdate'])->name('user.profile.update');
+
+
     Route::get('/user/activity/report', [userController::class, 'activityReport'])->name('user.activity.report');
     Route::get('/user/activity/actionreport/tambah', [userController::class, 'activitytambah'])->name('user.activity.actionreport.tambah');
     Route::post('/user/activity/report/store', [userController::class, 'activityStore'])->name('user.activity.report.store');
@@ -84,6 +105,8 @@ Route::middleware('checklogin')->group(function () {
     Route::get('/user/activity/actionreport/detail/{id}', [userController::class, 'activitydetail'])->name('user.activity.actionreport.detail');
     Route::get('/user/activity/report/ubah/{id}', [userController::class, 'activityEdit'])->name('user.activity.actionreport.ubah');
     Route::post('/user/activity/report/ubah/{id}', [userController::class, 'activityUpdate'])->name('user.activity.actionreport.update');
+
+
 
     Route::get('/user/activity/status', [userController::class, 'activityStatus'])->name('user.activity.status');
     Route::get('/user/activity/actionstatus/detail/{id}', [userController::class, 'activityDetailStatus'])->name('user.activity.actionstatus.detail');
@@ -94,5 +117,6 @@ Route::middleware('checklogin')->group(function () {
     Route::get('/user/activity/actionsolved/detail/{id}', [userController::class, 'activityDetailSolved'])->name('user.activity.actionsolved.detail');
     Route::get('/user/activity/solved/ubah/{id}', [userController::class, 'activityEditSolved'])->name('user.activity.actionsolved.ubah');
     Route::post('/user/activity/solved/ubah/{id}', [userController::class, 'activityUpdateSolved'])->name('user.activity.actionsolved.update');
+    
     
 });

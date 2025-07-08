@@ -55,7 +55,8 @@
 </style>
 </head>
 <body>
-    @include('admin.components.sidebar')
+    @include('admin.components.sidebar')\
+    <div class="padding">
 <div class="padding">
  <!-- ############ PAGE START-->
 
@@ -203,9 +204,12 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
-  <!-- ############ PAGE END-->
+  
    
   </div>
+</div>
+<!-- ############ PAGE END-->
+
 @include('admin.components.scripts')
 
 @include('admin.components.themes')

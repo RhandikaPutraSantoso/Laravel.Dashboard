@@ -14,6 +14,7 @@
 </head>
 <body>
     @include('admin.components.sidebar')
+    <div class="padding">
 <div class="padding">
  <!-- ############ PAGE START-->
 <table class="table table-striped b-t b-b dataTable no-footer display-inline">
@@ -65,6 +66,7 @@
   <!-- ############ PAGE END-->
    
   </div>
+</div>
 @include('admin.components.scripts')
 
 @include('admin.components.themes')

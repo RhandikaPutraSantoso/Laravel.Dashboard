@@ -3,16 +3,139 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\HanaConnection;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
-use Termwind\Components\Dd;
-
-
+use Exception;
 
 
 class userController extends Controller
 {
+    public function profileEdit()
+{
+    $username = Session::get('user_sap');
+
+    $koneksi = HanaConnection::getConnection();
+    $sql = "SELECT * FROM SBO_SUPPORT_SAPHANA.USER_SAP WHERE USERNAME = '$username'";
+    $result = $koneksi->query($sql);
+    $user = $result->fetch();
+
+    return view('user.profile.edit', compact('user'));
+}
+
+public function profileUpdate(Request $request)
+{
+    $request->validate([
+        'USERNAME'    => 'required|string|max:255',
+        'EMAIL'       => 'required|email|max:255',
+        'NM_COMPANY'  => 'required|string|max:255',
+        'JABATAN'     => 'required|string|max:255',
+    ]);
+
+    $oldUsername = Session::get('user_sap');
+    $newUsername = $request->USERNAME;
+    $email       = $request->EMAIL;
+    $company     = $request->NM_COMPANY;
+    $jabatan     = $request->JABATAN;
+
+    $koneksi = HanaConnection::getConnection();
+
+    // Validasi username sudah dipakai user lain
+    if ($newUsername !== $oldUsername) {
+        $checkSql = "SELECT COUNT(*) AS TOTAL FROM SBO_SUPPORT_SAPHANA.USER_SAP WHERE USERNAME = '$newUsername'";
+        $result = $koneksi->query($checkSql);
+        $row = $result->fetch();
+
+        if ($row['TOTAL'] > 0) {
+            return back()->withErrors(['USERNAME' => 'Username sudah digunakan.'])->withInput();
+        }
+    }
+
+    // Jalankan UPDATE langsung (tidak pakai execute)
+    $sql = "UPDATE SBO_SUPPORT_SAPHANA.USER_SAP 
+            SET USERNAME = '$newUsername', EMAIL = '$email', NM_COMPANY = '$company', JABATAN = '$jabatan' 
+            WHERE USERNAME = '$oldUsername'";
+
+    $koneksi->query($sql);
+
+    // Perbarui session
+    Session::put('user_sap', $newUsername);
+
+    return redirect()->route('user.profile.edit')->with('success', 'Profil berhasil diperbarui.');
+}
+
+
+public function getRecentActivityTimeline()
+{
+    // Cek apakah session tersedia
+    if (!Session::has('user_sap') || !Session::has('company')) {
+        abort(404); 
+    }
+
+    // Ambil username dari session
+    $username = Session::get('user_sap');
+    $username = preg_replace('/[^a-zA-Z0-9_.@-]/', '', $username); // sanitasi basic
+
+    try {
+        $koneksi = HanaConnection::getConnection();
+
+        $query = "
+            SELECT 
+                ID_ACTIVITY,
+                TIKET,
+                TGL_KOMENTAR,
+                TGL_STATUS,
+                TGL_SOLVED
+            FROM SBO_SUPPORT_SAPHANA.ACTIVITY
+            WHERE NM_USER = '$username' AND ID_ACTIVITY IS NOT NULL
+            ORDER BY COALESCE(TGL_SOLVED, TGL_STATUS, TGL_KOMENTAR) DESC
+            LIMIT 10
+        ";
+
+        $data = $koneksi->query($query)->fetchAll(\PDO::FETCH_ASSOC);
+        $logs = [];
+
+        foreach ($data as $row) {
+            if (!empty($row['TGL_KOMENTAR'])) {
+                $logs[] = [
+                    'log_message' => "<strong>{$row['TIKET']}</strong> Admin telah membuat komentar",
+                    'log_time' => $row['TGL_KOMENTAR']
+                ];
+            }
+            if (!empty($row['TGL_STATUS'])) {
+                $logs[] = [
+                    'log_message' => "<strong>{$row['TIKET']}</strong> Admin telah memberikan status",
+                    'log_time' => $row['TGL_STATUS']
+                ];
+            }
+            if (!empty($row['TGL_SOLVED'])) {
+                $logs[] = [
+                    'log_message' => "<strong>{$row['TIKET']}</strong> Admin telah memberikan solved",
+                    'log_time' => $row['TGL_SOLVED']
+                ];
+            }
+        }
+
+        // Urutkan dari log terbaru
+        usort($logs, fn($a, $b) => strtotime($b['log_time']) - strtotime($a['log_time']));
+        $logs = array_slice($logs, 0, 5); // batas maksimal 5
+
+        return response()->json([
+            'log_count' => count($logs),
+            'logs' => $logs
+        ]);
+
+    } catch (Exception $e) {
+        return response()->json([
+            'logs' => [],
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
+
+
+
+
+
 // This method is used to display the dashboard page
    public function index(Request $request)
 {
@@ -165,13 +288,16 @@ class userController extends Controller
 
     // Tentukan kode perusahaan
     $kodePerusahaan = match ($companyName) {
-        'cmnp' => '01',
-        'cpi' => '02',
-        'cw' => '03',
-        'cms' => '04',
-        'cmnproper' => '05',
-        'cmlj' => '06',
-        'ckjt' => '07',
+        'citra marga nusaphala persada' => '01',
+        'citra persada infrastruktur' => '02',
+        'citra waspphutowa' => '03',
+        'citra margatama surabaya' => '04',
+        'citra marga nusantara propertindo' => '05',
+        'citra marga lintas jabar' => '06',
+        'citra karya jabar tol' => '07',
+        'girder indonesia' => '08',
+        'marga sarana jabar' => '09',
+        'jasa sarana' => '10',
         default => 'UNK',
     };
 

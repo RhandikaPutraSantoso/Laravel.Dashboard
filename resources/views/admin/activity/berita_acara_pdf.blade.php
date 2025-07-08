@@ -94,7 +94,7 @@
 
     <p class="isi">
         Nama: <strong>{{ $activity['NM_USER'] }}</strong><br>
-        Jabatan: <strong>{{ $activity['JABATAN_USER'] ?? '...' }}</strong><br>
+        Jabatan: <strong>{{ $activity['JABATAN'] ?? '...' }}</strong><br>
         Bertindak untuk dan atas nama <strong>{{ $activity['NM_COMPANY'] }}</strong>, yang selanjutnya disebut sebagai <strong>“PIHAK KEDUA”</strong>.
     </p>
 

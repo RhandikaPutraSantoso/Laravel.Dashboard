@@ -66,10 +66,6 @@
             <td>: {{ $activity['NM_COMPANY'] ?? '-' }}</td>
         </tr>
         <tr>
-            <td class="label">Email</td>
-            <td>: {{ $activity['MAIL_COMPANY'] }}</td>
-        </tr>
-        <tr>
             <td class="label">User</td>
             <td>: {{ $activity['NM_USER'] }}</td>
         </tr>

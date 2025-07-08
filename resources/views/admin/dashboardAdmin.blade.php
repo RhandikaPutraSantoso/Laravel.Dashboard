@@ -97,6 +97,7 @@
 <body>
     @include('admin.components.sidebar')
     <div class="padding">
+    <div class="padding">
         <div class="box">
             <div class="padding ">
                 <div class="box">
@@ -274,6 +275,7 @@
             </div>
         </div>
     </div>
+    </div>
     <!-- Chart Script -->
     <!-- CHART.JS SCRIPT -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -281,15 +283,17 @@
     const labels = {!! json_encode(array_column($dataChart, 'NM_COMPANY')) !!};
     const data = {!! json_encode(array_map('intval', array_column($dataChart, 'JUMLAH'))) !!};
 
-    const logoMap = {
-        "cmnp": "/layouts/assets/images/cmnp.png",
-        "cmnpproper": "/layouts/assets/images/cmnproper.png",
-        "cms": "/layouts/assets/images/cms.png",
-        "cpi": "/layouts/assets/images/cpi.png",
-        "cmlj": "/layouts/assets/images/cmlj.png",
-        "cw": "/layouts/assets/images/cw.jpg",
-        "ckjt": "/layouts/assets/images/ckjt.jpg"
+       const logoMap = {
+        "citra marga nusaphala persada": "/layouts/assets/images/cmnp.png",
+        "citra marga nusantara propertindo": "/layouts/assets/images/cmnproper.png",
+        "citra margatama surabaya": "/layouts/assets/images/cms.png",
+        "citra persada infrastruktur": "/layouts/assets/images/cpi.png",
+        "citra marga lintas jabar": "/layouts/assets/images/cmlj.png",
+        "citra waspphutowa": "/layouts/assets/images/cw.jpg",
+        "citra karya jabar tol": "/layouts/assets/images/ckjt.jpg",
+        "girder indonesia": "/layouts/assets/images/gi.png",
     };
+
 
     const colors = [
         '#3498db', '#1abc9c', '#f1c40f',

@@ -19,6 +19,7 @@
 
 @include('admin.components.sidebar')
 <div class="padding">
+<div class="padding">
  @if(session('success'))
     <div class="alert alert-success alert-dismissible fade show" role="alert" id="success-alert">
         {{ session('success') }}
@@ -130,6 +131,7 @@
         </div>
     </div>
 </div>
+</div>
 
 
 
@@ -187,6 +189,14 @@ $(document).ready(function () {
   case 'Not Continue':
   case 'Not Proses Yet':
     badgeClass = 'bg-danger';
+    break;
+  
+  case 'Urgent':
+    badgeClass = 'bg-danger text-white'; // Merah
+    break;
+  
+   case 'Non Urgent':
+    badgeClass = 'bg-success text-white'; // Hijau
     break;
 
   case 'Hard':

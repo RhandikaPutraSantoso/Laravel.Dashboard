@@ -16,6 +16,7 @@
 <body>
 @include('admin.components.sidebar')
 <div class="padding">
+<div class="padding">
     
     <h2>STATUS FOR SAP</h2>
     <div class="padding">
@@ -125,6 +126,7 @@
             </div>
         </div>
     </div>
+</div>
 </div>
 
   <!-- ############ PAGE END-->

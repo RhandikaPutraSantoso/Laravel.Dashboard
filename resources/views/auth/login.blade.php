@@ -17,27 +17,7 @@
 
         <form method="POST" action="{{ url('/login') }}">
             @csrf
-
-            <div class="form-group">
-                <label for="type">Login As</label>
-                <select name="type" id="type" class="form-control" onchange="toggleFields()">
-                    <option value="user">User</option>
-                    <option value="admin">Admin</option>
-                </select>
-            </div>
-
-            <div id="user-fields" style="display: none;">
-                <div class="form-group">
-                    <label>Email Perusahaan</label>
-                    <input type="email" name="email" class="form-control" placeholder="Email Perusahaan">
-                </div>
-
-                <div class="form-group">
-                    <label>Nama Perusahaan</label>
-                    <input type="text" name="company" class="form-control" placeholder="Nama Perusahaan">
-                </div>
-            </div>
-
+            
             <div class="form-group">
                 <label>Username</label>
                 <input type="text" name="username" class="form-control" placeholder="Username" required>
@@ -49,6 +29,8 @@
             </div>
 
             <button type="submit" class="btn btn-primary w-100">Login</button>
+
+
 
             @if ($errors->any())
                 <div class="alert alert-danger mt-3">

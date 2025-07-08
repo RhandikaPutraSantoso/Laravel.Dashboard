@@ -16,6 +16,7 @@
 <body>
 @include('user.components.sidebar')
 <div class="padding">
+<div class="padding">
     <h2>REQUESTS FOR SAP</h2>
     <div class="padding">
         <div class="box">
@@ -77,6 +78,7 @@
             </div>
         </div>
     </div>
+</div>
 </div>
 
 

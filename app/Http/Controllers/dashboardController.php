@@ -262,16 +262,21 @@ public function sendEmail($id)
         abort(400, 'Invalid ID');
     }
 
-    $sql = "
-        SELECT 
-            A.*, 
-            C.NM_COMPANY,
-            K.NM_DIFFICULT 
-        FROM SBO_SUPPORT_SAPHANA.ACTIVITY A
-        LEFT JOIN SBO_SUPPORT_SAPHANA.COMPANY_SAP C ON A.ID_COMPANY = C.ID_COMPANY
-        LEFT JOIN SBO_SUPPORT_SAPHANA.DIFFICULT_LEVEL K ON A.ID_DIFFICULT = K.ID_DIFFICULT
-        WHERE A.ID_ACTIVITY = '$id'
-    ";
+// Ambil data activity + nama company + tingkat kesulitan
+$sql = "
+    SELECT 
+        A.*, 
+        C.NM_COMPANY,
+        K.NM_DIFFICULT,
+        U.JABATAN
+    FROM SBO_SUPPORT_SAPHANA.ACTIVITY A
+    LEFT JOIN SBO_SUPPORT_SAPHANA.COMPANY_SAP C ON A.ID_COMPANY = C.ID_COMPANY
+    LEFT JOIN SBO_SUPPORT_SAPHANA.DIFFICULT_LEVEL K ON A.ID_DIFFICULT = K.ID_DIFFICULT
+    LEFT JOIN SBO_SUPPORT_SAPHANA.USER_SAP U ON A.NM_USER = U.USERNAME
+    WHERE A.ID_ACTIVITY = '$id'
+";
+
+
 
     $activity = $koneksi->query($sql)->fetch(\PDO::FETCH_ASSOC);
 
@@ -294,7 +299,7 @@ public function sendEmail($id)
         'cms' => public_path('layouts/assets/images/cms.png'),
         'cpi' => public_path('layouts/assets/images/cpi.png'),
         'cmlj' => public_path('layouts/assets/images/cmlj.png'),
-        'cw' => public_path('layouts/assets/images/cw.jpg'),
+        'Citra Waspphutowa' => public_path('layouts/assets/images/cw.jpg'),
         'ckjt' => public_path('layouts/assets/images/ckjt.jpg'),
     ];
 
@@ -325,7 +330,7 @@ public function sendEmail($id)
             'telepon' => '(021) 5553332',
             'email' => 'admin@cmlj.co.id',
         ],
-        'cw' => [
+        'Citra Waspphutowa' => [
             'alamat' => 'Jl. Tol Depok - Antasari No.100, RT.4/RW.2, Cilandak Bar., Kec. Cilandak, Kota Jakarta Selatan, Daerah Khusus Ibukota Jakarta 12450',
             'telepon' => '(0264) 432100',
             'email' => 'support@cw.co.id',
@@ -920,7 +925,6 @@ public function sendEmail($id)
                         'username' => 'required',
                         'subject' => 'required|max:255',
                         'deskripsi' => 'required',
-                        'komentar' => 'nullable', // Assuming komentar can be empty
                         'ID_STATUS' => 'required|numeric',
                         'foto_baru.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048' // For new photos
                     ]);
@@ -935,7 +939,6 @@ public function sendEmail($id)
                             NM_USER = ?,
                             SUBJECT = ?,
                             DESKRIPSI_SOLVED = ?,
-                            KOMENTAR = ?,
                             ID_STATUS = ?,
                             TGL_SOLVED = ?
                         WHERE ID_ACTIVITY = ?
@@ -947,7 +950,6 @@ public function sendEmail($id)
                         $request->username,
                         $request->subject,
                         $request->deskripsi,
-                        $request->komentar,
                         $request->ID_STATUS,
                         $TGL_SOLVED,
                         $id
@@ -1336,6 +1338,126 @@ public function emailDestroy($id)
 
         return redirect()->route('admin.pengaturan.status')->with('success', 'Status level updated successfully.');
     }
+
+
+
+
+
+
+
+
+
+    public function company()
+    {
+        if (!session('admin_sap')) {
+           abort(404); // Activity not found
+        }
+        $koneksi = HanaConnection::getConnection();
+        $COMPANYSettings = $koneksi->query("SELECT * FROM SBO_SUPPORT_SAPHANA.COMPANY_SAP")->fetchAll(\PDO::FETCH_ASSOC);
+        
+        
+       
+        return view('admin.pengaturan.company', compact('COMPANYSettings'));
+    }
+
+    public function companyDestroy($id)
+    {
+        if (!session('admin_sap')) {
+            abort(404); // Unauthorized access
+        }
+
+        $koneksi = HanaConnection::getConnection();
+        $id = (int) $id;
+
+        $sqlDelete = "DELETE FROM SBO_SUPPORT_SAPHANA.COMPANY_SAP WHERE ID_COMPANY = $id";
+        $koneksi->exec($sqlDelete);
+
+        return redirect()->route('admin.pengaturan.company')->with('success', 'COMPANY setting deleted successfully.');
+    }
+
+    public function companyTambah()
+    {
+        if (!session('admin_sap')) {
+            abort(404); // Unauthorized access
+        }
+
+        return view('admin.pengaturan.actioncompany.tambah');
+    }
+
+    public function companyStore(Request $request)
+    {
+        if (!session('admin_sap')) {
+            abort(404); // Unauthorized access
+        }
+
+        $request->validate([
+            'NM_COMPANY' => 'required|max:255|min:3', // Validasi nama COMPANY
+            
+        ]);
+
+        $koneksi = HanaConnection::getConnection();
+
+        // Ambil ID_COMPANY terakhir dan tambah 1
+        $sqlMaxId = "SELECT MAX(ID_COMPANY) AS MAX_ID FROM SBO_SUPPORT_SAPHANA.COMPANY_SAP";
+        $resultId = $koneksi->query($sqlMaxId)->fetch(\PDO::FETCH_ASSOC);
+        $nextId = (int) $resultId['MAX_ID'] + 1;
+
+        // Simpan COMPANY baru
+        $sqlInsert = "INSERT INTO SBO_SUPPORT_SAPHANA.COMPANY_SAP (ID_COMPANY, NM_COMPANY) VALUES ($nextId, '{$request->NM_COMPANY}')";
+        $koneksi->exec($sqlInsert);
+
+        return redirect()->route('admin.pengaturan.company')->with('success', 'COMPANY level added successfully.');
+    }
+
+    public function companyEdit($id)
+    {
+        if (!session('admin_sap')) {
+            abort(404); // Unauthorized access
+        }
+
+        $koneksi = HanaConnection::getConnection();
+
+        // Validasi ID untuk memastikan integer
+        if (!is_numeric($id)) {
+            abort(400, 'Invalid ID');
+        }
+
+        // Query langsung tanpa prepare-execute
+        $COMPANY = $koneksi->query("SELECT * FROM SBO_SUPPORT_SAPHANA.COMPANY_SAP WHERE ID_COMPANY = {$id}")->fetch(\PDO::FETCH_ASSOC);
+
+        if (!$COMPANY) {
+            abort(404); // Data tidak ditemukan
+        }
+
+        return view('admin.pengaturan.actionCOMPANY.ubah', compact('COMPANY'));
+    }
+
+    public function companyUpdate(Request $request, $id)
+    {
+        if (!session('admin_sap')) {
+            abort(404); // Unauthorized access
+        }
+
+        $request->validate([
+            'NM_COMPANY' => 'required|max:255|min:3', // Validasi nama COMPANY
+            // Tambahkan validasi lain sesuai kebutuhan
+
+        ]);
+
+        $koneksi = HanaConnection::getConnection();
+
+        // Update COMPANY
+        $sqlUpdate = "UPDATE SBO_SUPPORT_SAPHANA.COMPANY_SAP SET NM_COMPANY = '{$request->NM_COMPANY}' WHERE ID_COMPANY = {$id}";
+        $koneksi->exec($sqlUpdate);
+
+        return redirect()->route('admin.pengaturan.company')->with('success', 'COMPANY level updated successfully.');
+    }
+
+
+
+
+
+
 
 
 

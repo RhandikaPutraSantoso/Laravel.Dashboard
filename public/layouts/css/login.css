@@ -11,7 +11,7 @@
 /* Base Styles */
 body {
   font-family: var(--font-family);
-  background: url('../assets/images/background.png') no-repeat center center / cover;
+  background: url('../assets/images/backgroundCitramarga.jpg') no-repeat center center / cover;
   display: flex;
   justify-content: center;
   align-items: center;
