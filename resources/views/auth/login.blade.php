@@ -38,6 +38,8 @@
                 </div>
             @endif
         </form>
+        {{-- lupa password --}}
+        <a href="/forgot-password" >Lupa Password</a>
     </div>
 
     <script>

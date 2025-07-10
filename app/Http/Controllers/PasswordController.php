@@ -3,16 +3,19 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 use App\Helpers\HanaConnection;
 
 class PasswordController extends Controller
 {
+    // Form ganti password
     public function edit()
     {
         return view('auth.change-password');
     }
 
+    // Proses update password
     public function update(Request $request)
     {
         $request->validate([
@@ -33,7 +36,7 @@ class PasswordController extends Controller
         try {
             $koneksi = HanaConnection::getConnection();
 
-            // Ambil password lama dari database
+            // Ambil password dari database
             $sql = "SELECT PASSWORD FROM $table WHERE $idField = '$userId'";
             $stmt = $koneksi->query($sql);
             $result = $stmt->fetch(\PDO::FETCH_ASSOC);
@@ -44,15 +47,20 @@ class PasswordController extends Controller
 
             $dbPassword = $result['PASSWORD'];
 
-            // Cek langsung tanpa hashing
-            if ($request->current_password !== $dbPassword) {
+            // Cek password lama (hash)
+            if (!Hash::check($request->current_password, $dbPassword)) {
                 return back()->withErrors(['current_password' => 'Password lama salah.']);
             }
 
-            // Update langsung password baru (plaintext)
-            $newPassword = $request->password;
-            $updateSql = "UPDATE $table SET PASSWORD = '$newPassword' WHERE $idField = '$userId'";
-            $koneksi->query($updateSql);
+            // Hash password baru
+            $hashedPassword = Hash::make($request->password);
+
+            // Update password ke DB
+            $updateSql = "UPDATE $table SET PASSWORD = :password WHERE $idField = :id";
+            $stmt = $koneksi->prepare($updateSql);
+            $stmt->bindParam(':password', $hashedPassword);
+            $stmt->bindParam(':id', $userId);
+            $stmt->execute();
 
             return back()->with('success', 'Password berhasil diubah.');
         } catch (\Exception $e) {

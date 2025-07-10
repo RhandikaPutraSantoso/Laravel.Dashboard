@@ -16,8 +16,6 @@ use Illuminate\Support\Facades\Session;
 use Termwind\Components\Dd;
 
 
-
-
 class dashboardController extends Controller
 {
    public function fetch()
@@ -182,34 +180,35 @@ public function fetchActivityLog()
 public function sendEmail($id)
 {
     date_default_timezone_set("Asia/Jakarta");
+
     try {
         $koneksi = HanaConnection::getConnection();
-        $id = intval($id);
+        $id = intval($id); // aman untuk query langsung
 
         // Ambil data aktivitas
         $queryAkt = "SELECT 
-                ACTIVITY.*, 
-                COMPANY_SAP.NM_COMPANY 
-            FROM SBO_SUPPORT_SAPHANA.ACTIVITY 
-            LEFT JOIN SBO_SUPPORT_SAPHANA.COMPANY_SAP ON ACTIVITY.ID_COMPANY = COMPANY_SAP.ID_COMPANY 
-            WHERE ID_ACTIVITY = $id";
-
+                        ACTIVITY.*, 
+                        COMPANY_SAP.NM_COMPANY 
+                    FROM SBO_SUPPORT_SAPHANA.ACTIVITY 
+                    LEFT JOIN SBO_SUPPORT_SAPHANA.COMPANY_SAP 
+                        ON ACTIVITY.ID_COMPANY = COMPANY_SAP.ID_COMPANY 
+                    WHERE ID_ACTIVITY = $id";
         $stmt = $koneksi->query($queryAkt);
         $activity = $stmt->fetch(\PDO::FETCH_ASSOC);
 
-        if (!$activity || empty($activity['MAIL_COMPANY'])) {
-            return back()->with('error', 'Data aktivitas atau email tidak ditemukan.');
+        if (!$activity) {
+            return back()->with('error', 'Data aktivitas tidak ditemukan.');
         }
 
-        // Ambil semua foto dari tabel foto aktivitas (asumsi nama tabel: ACTIVITY_FOTO)
+        // Ambil semua foto
         $queryFoto = "SELECT NM_ACTIVITY_FOTO FROM SBO_SUPPORT_SAPHANA.ACTIVITY_FOTO WHERE ID_ACTIVITY = $id";
         $stmtFoto = $koneksi->query($queryFoto);
         $fotos = $stmtFoto->fetchAll(\PDO::FETCH_ASSOC);
 
-        // Kirim email
-        Mail::to($activity['MAIL_COMPANY'])->send(new ActivityReportMail($activity, $fotos));
+        // Kirim email ke support
+        Mail::to('support@mitrainti.com')->send(new ActivityReportMail($activity, $fotos));
 
-        return back()->with('success', 'Email berhasil dikirim ke ' . $activity['MAIL_COMPANY']);
+        return back()->with('success', 'Email berhasil dikirim ke support@mitrainti.com');
     } catch (Exception $e) {
         Log::error('Email gagal: ' . $e->getMessage());
         return back()->with('error', 'Terjadi kesalahan saat mengirim email.');

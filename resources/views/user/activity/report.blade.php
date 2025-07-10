@@ -89,5 +89,59 @@
 @include('user.components.scripts')
 
 @include('user.components.themes')
+<script>
+$(document).ready(function () {
+  var table = $('#table').DataTable({
+    responsive: true,
+    order: [[0, 'desc']],
+    dom:
+      "<'row mb-3'<'col-md-3'l><'col-md-6 text-center'B><'col-md-3'f>>" +
+      "<'row'<'col-md-12'tr>>" +
+      "<'row mt-2'<'col-md-5'i><'col-md-7'p>>",
+    buttons: [
+      { extend: 'csv', className: 'btn btn-outline-info btn-sm me-1' },
+      { extend: 'excel', className: 'btn btn-outline-success btn-sm me-1' },
+      { extend: 'pdf', className: 'btn btn-outline-danger btn-sm me-1' },
+      { extend: 'print', className: 'btn btn-outline-primary btn-sm' }
+    ],
+    lengthMenu: [
+      [5, 10, 25, 50, 100, -1],
+      [5, 10, 25, 50, 100, "All"]
+    ],
+    language: {
+      loadingRecords: "Loading...",
+      zeroRecords: "Data tidak ditemukan",
+      info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+      infoEmpty: "Menampilkan 0 sampai 0 dari 0 data",
+      search: "Search:",
+      paginate: {
+        next: "Next",
+        previous: "Previous"
+      }
+    },
+    initComplete: function () {
+      this.api().columns().every(function () {
+        var column = this;
+        var select = $('<select><option value=""></option></select>')
+          .appendTo($(column.footer()).empty())
+          .on('change', function () {
+            var val = $.fn.dataTable.util.escapeRegex(
+              $(this).val()
+            );
+            column
+              .search(val ? '^' + val + '$' : '', true, false)
+              .draw();
+          });
+
+        column.data().unique().sort().each(function (d, j) {
+          select.append('<option value="' + d + '">' + d + '</option>')
+        });
+      });
+    }
+  });
+
+  table.buttons().container().appendTo('#table_wrapper .col-md-6:eq(0)');
+});
+</script>
 </body>
 </html>

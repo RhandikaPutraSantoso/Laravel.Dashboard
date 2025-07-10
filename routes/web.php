@@ -4,7 +4,78 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\dashboardController;
 use App\Http\Controllers\userController;
 use App\Http\Controllers\PasswordController;
+use App\Http\Controllers\ForgotPasswordController;
+use Illuminate\Support\Facades\Route;
 use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
+use App\Helpers\HanaConnection;
+
+// Route::get('/reset-password-plaintext', function () {
+//     $koneksi = HanaConnection::getConnection();
+
+//     // ✅ Reset USER_SAP dengan USERNAME = 'dika'
+//     $newUserPass = 'user123';
+//     $sqlUser = "UPDATE SBO_SUPPORT_SAPHANA.USER_SAP SET PASSWORD = '$newUserPass' WHERE USERNAME = 'dika'";
+//     $koneksi->exec($sqlUser);
+
+//     // ✅ Reset ADMIN_SAP dengan USERNAME = 'admin'
+//     $newAdminPass = 'admin123';
+//     $sqlAdmin = "UPDATE SBO_SUPPORT_SAPHANA.ADMIN_SAP SET PASSWORD = '$newAdminPass' WHERE USERNAME = 'admin'";
+//     $koneksi->exec($sqlAdmin);
+
+//     return "✅ Password user 'dika' direset ke 'user123'<br>✅ Password admin 'admin' direset ke 'admin123'";
+// });
+
+
+// Route::get('/migrasi-password', function () {
+//     $koneksi = HanaConnection::getConnection();
+
+//     $log = [];
+
+//     // 🔹 Migrasi ADMIN_SAP
+//     $stmtAdmin = $koneksi->query("SELECT ID_ADMIN, PASSWORD FROM SBO_SUPPORT_SAPHANA.ADMIN_SAP");
+//     foreach ($stmtAdmin as $row) {
+//         $id = $row['ID_ADMIN'];
+//         $password = $row['PASSWORD'];
+
+//         // Jika belum di-hash
+//         if (Hash::needsRehash($password)) {
+//             $hashed = Hash::make($password);
+//             $update = $koneksi->prepare("UPDATE SBO_SUPPORT_SAPHANA.ADMIN_SAP SET PASSWORD = ? WHERE ID_ADMIN = ?");
+//             $update->execute([$hashed, $id]);
+
+//             $log[] = "✔ ADMIN $id berhasil dihash.";
+//         } else {
+//             $log[] = "⏭ ADMIN $id sudah ter-hash.";
+//         }
+//     }
+
+//     // 🔹 Migrasi USER_SAP
+//     $stmtUser = $koneksi->query("SELECT EMP_ID, PASSWORD FROM SBO_SUPPORT_SAPHANA.USER_SAP");
+//     foreach ($stmtUser as $row) {
+//         $id = $row['EMP_ID'];
+//         $password = $row['PASSWORD'];
+
+//         if (Hash::needsRehash($password)) {
+//             $hashed = Hash::make($password);
+//             $update = $koneksi->prepare("UPDATE SBO_SUPPORT_SAPHANA.USER_SAP SET PASSWORD = ? WHERE EMP_ID = ?");
+//             $update->execute([$hashed, $id]);
+
+//             $log[] = "✔ USER $id berhasil dihash.";
+//         } else {
+//             $log[] = "⏭ USER $id sudah ter-hash.";
+//         }
+//     }
+
+//     return implode("<br>", $log); // Output ke browser
+// });
+
+
+
+
+Route::get('/forgot-password', [ForgotPasswordController::class, 'showForm'])->name('forgot-password');
+Route::post('/forgot-password', [ForgotPasswordController::class, 'checkUser']);
+// Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword'])->name('reset-password');
+
 
 Route::get('/', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.post');

@@ -270,16 +270,6 @@
               </ul>
             </li>
 
-            <li >
-              <a href="{{ Route('logout') }}" class="{{ Request::is('index') ? 'active' : '' }}">
-                <span class="nav-icon">
-                  <i class="material-icons">&#xe879;</i>
-                </span>
-                <span class="nav-text">LogOut</span>
-              </a>
-            </li>
-
-
           </ul>
         </nav>
       </div>

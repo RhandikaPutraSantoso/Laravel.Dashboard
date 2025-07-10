@@ -2472,29 +2472,45 @@ body {
 .opacity-3 {
   opacity: 0.3; }
 
+/* Panel switcher: sembunyi di bawah, muncul naik */
 .switcher {
-  z-index: 1050;
   position: fixed;
-  top: 78px;
-  right: -240px;
-  width: 240px;
-  -webkit-transition: right 0.2s ease;
-  transition: right 0.2s ease;
+  bottom: -350px; /* disembunyikan di luar layar */
+  right: 20px;
+  width: 260px;
+  background-color: #fff;
   border: 1px solid rgba(120, 120, 120, 0.1);
-  background-clip: padding-box; }
-  .switcher.active {
-    right: -2px;
-    z-index: 1060; }
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+  transition: bottom 0.3s ease;
+  z-index: 1050;
+}
 
-.switcher .sw-btn {
-  position: absolute;
-  left: -43px;
-  top: -1px;
-  padding: 10px 15px;
-  z-index: 1045;
-  border: 1px solid rgba(120, 120, 120, 0.1);
-  border-right-width: 0;
-  background-clip: padding-box; }
+.switcher.active {
+  bottom: 70px; /* muncul di atas tombol gear */
+  z-index: 1060;
+}
+
+/* Tombol gear tetap mengambang di kanan bawah */
+.sw-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 45px;
+  height: 45px;
+  background: #333;
+  color: #fff;
+  font-size: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 1065;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+
 
 #sw-demo {
   top: 118px; }

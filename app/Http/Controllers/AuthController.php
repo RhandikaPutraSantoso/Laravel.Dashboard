@@ -3,23 +3,21 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use App\Helpers\HanaConnection;
 
 class AuthController extends Controller
 {
-    // Menampilkan form login
     public function showLoginForm()
     {
         return view('auth.login');
     }
 
-    // Fungsi sanitasi input
     private function cleanInput($input)
     {
-        return preg_replace('/[^a-zA-Z0-9@.\-_]/', '', $input);
+        return trim(preg_replace('/[^a-zA-Z0-9@.\-_\s]/', '', $input));
     }
 
-    // Proses login otomatis (admin & user)
     public function login(Request $request)
     {
         $request->validate([
@@ -27,52 +25,51 @@ class AuthController extends Controller
             'password' => 'required|string|max:100',
         ]);
 
-        $username = $this->cleanInput($request->username);
-        $password = $this->cleanInput($request->password);
+        $username = strtoupper($this->cleanInput($request->username));
+        $inputPassword = $request->password;
 
         try {
             $koneksi = HanaConnection::getConnection();
 
-            // Cek ADMIN_SAP
-            $sqlAdmin = "SELECT * FROM SBO_SUPPORT_SAPHANA.ADMIN_SAP WHERE USERNAME = '$username' AND PASSWORD = '$password' LIMIT 1";
-            $stmtAdmin = $koneksi->query($sqlAdmin);
-            $admin = $stmtAdmin->fetch(\PDO::FETCH_ASSOC);
+            // 🔹 Cek ADMIN_SAP
+            $sqlAdmin = "SELECT * FROM SBO_SUPPORT_SAPHANA.ADMIN_SAP WHERE UPPER(USERNAME) = '$username' LIMIT 1";
+            $admin = $koneksi->query($sqlAdmin)->fetch(\PDO::FETCH_ASSOC);
 
-            if ($admin) {
+            if ($admin && Hash::check($inputPassword, $admin['PASSWORD'])) {
                 session([
                     'admin_sap'   => $admin['USERNAME'],
                     'admin_id'    => $admin['ID_ADMIN'],
-                    'email'      => null,
-                    'company'    => 'ADMIN',
-                    'login_type' => 'admin',
+                    'email'       => null,
+                    'company'     => 'ADMIN',
+                    'login_type'  => 'admin',
                 ]);
+                session()->regenerate();
                 return view('admin.loadingAdmin');
             }
 
-            // Cek USER_SAP
-            $sqlUser = "SELECT * FROM SBO_SUPPORT_SAPHANA.USER_SAP WHERE USERNAME = '$username' AND PASSWORD = '$password' LIMIT 1";
-            $stmtUser = $koneksi->query($sqlUser);
-            $user = $stmtUser->fetch(\PDO::FETCH_ASSOC);
+            // 🔹 Cek USER_SAP
+            $sqlUser = "SELECT * FROM SBO_SUPPORT_SAPHANA.USER_SAP WHERE UPPER(USERNAME) = '$username' LIMIT 1";
+            $user = $koneksi->query($sqlUser)->fetch(\PDO::FETCH_ASSOC);
 
-            if ($user) {
+            if ($user && Hash::check($inputPassword, $user['PASSWORD'])) {
                 session([
-                    'user_sap'   => $user['USERNAME'],
-                    'user_id'    => $user['EMP_ID'],
-                    'email'      => $user['EMAIL'],
-                    'company'    => $user['NM_COMPANY'],
-                    'login_type' => 'user',
+                    'user_sap'    => $user['USERNAME'],
+                    'user_id'     => $user['EMP_ID'],
+                    'email'       => $user['EMAIL'],
+                    'company'     => $user['NM_COMPANY'],
+                    'login_type'  => 'user',
                 ]);
+                session()->regenerate();
                 return view('user.loadingUser');
             }
 
-            // Gagal login
+            // ❌ Jika tidak ditemukan atau password salah
             return back()->withErrors(['invalid' => 'Username atau password salah.']);
         } catch (\Exception $e) {
             return back()->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()]);
         }
     }
 
-    // Logout
     public function logout()
     {
         session()->flush();
