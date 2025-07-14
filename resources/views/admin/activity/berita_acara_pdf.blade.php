@@ -107,7 +107,7 @@
     </p>
     <ol class="isi">
         <li>Menganalisa & Cek Issue SAP HANA</li>
-        <li>Melakukan Perbaikan Issue: {{ $activity['SUBJECT'] }}</li>
+        <li>Melakukan Perbaikan Issue 100%: {{ $activity['SUBJECT'] }}</li>
         <li>Melakukan Testing dengan User</li>
         <li>Memastikan Issue SAP HANA Sudah Terselesaikan dan Berjalan Dengan Baik</li>
     </ol>

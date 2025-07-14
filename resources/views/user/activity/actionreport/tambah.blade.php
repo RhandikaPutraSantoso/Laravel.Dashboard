@@ -147,6 +147,7 @@
 
     <div class="form-group">
         <label>Upload Foto</label>
+        <small class="form-text text-muted">Anda dapat mengunggah beberapa foto hanya file yang berformat .jpg, .jpeg, .png.</small>
         <div class="dz-message" ui-jp="dropzone" >
         <div id="drop-zone" class="drop-zone dropzone white" >
             <h4 class="m-t-lg m-b-md">Drop files here or click to upload.</h4>
