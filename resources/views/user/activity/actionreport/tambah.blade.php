@@ -132,12 +132,12 @@
 
         <div class="form-group">
             <label>Email Company</label>
-            <input type="text" class="form-control" name="email" value="{{ $email }}" required>
+            <input type="text" class="form-control" name="email" value="{{ $email }}" readonly required>
         </div>
 
         <div class="form-group">
             <label>Nama User</label>
-            <input type="text" class="form-control" name="username" value="{{ $username }}" required>
+            <input type="text" class="form-control" name="username" value="{{ $username }}" readonly required>
         </div>
 
         <div class="form-group">
@@ -164,6 +164,7 @@
 
         <div class="form-group">
             <label>Deskripsi</label>
+            	<small class="form-text text-muted">Max 255 karakter</small>
             <textarea class="form-control" name="deskripsi" rows="10" required>Deskripsikan aktivitas Anda di sini...</textarea>
         </div>
 
