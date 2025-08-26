@@ -56,14 +56,14 @@
             @enderror
         </div>
 
-        <div class="form-group">
-            <label for="NM_COMPANY">Nama Perusahaan</label>
-            <input type="text" name="NM_COMPANY" class="form-control @error('NM_COMPANY') is-invalid @enderror" 
-                   value="{{ old('NM_COMPANY', $user['NM_COMPANY']) }}">
-            @error('NM_COMPANY')
-                <div class="invalid-feedback">{{ $message }}</div>
-            @enderror
-        </div>
+            <div class="form-group">
+    <label for="NM_COMPANY">Nama Perusahaan</label>
+    <input type="text" name="NM_COMPANY" class="form-control @error('NM_COMPANY') is-invalid @enderror" 
+           value="{{ old('NM_COMPANY', $user['NM_COMPANY']) }}" readonly>
+    @error('NM_COMPANY')
+        <div class="invalid-feedback">{{ $message }}</div>
+    @enderror
+</div>
 
         <div class="form-group">
             <label for="JABATAN">Jabatan</label>

@@ -206,9 +206,9 @@ public function sendEmail($id)
         $fotos = $stmtFoto->fetchAll(\PDO::FETCH_ASSOC);
 
         // Kirim email ke support
-        Mail::to('support@mitrainti.com')->send(new ActivityReportMail($activity, $fotos));
+        Mail::to('rhndkputr@gmail.com')->send(new ActivityReportMail($activity, $fotos));
 
-        return back()->with('success', 'Email berhasil dikirim ke support@mitrainti.com');
+        return back()->with('success', 'Email berhasil dikirim ke rhndkputr@gmail.com');
     } catch (Exception $e) {
         Log::error('Email gagal: ' . $e->getMessage());
         return back()->with('error', 'Terjadi kesalahan saat mengirim email.');
