@@ -165,6 +165,7 @@
 
         <div class="form-group">
             <label>Deskripsi</label>
+            	<small class="form-text text-muted">Max 255 karakter</small>
             <textarea class="form-control" name="deskripsi" rows="10" required>Deskripsikan aktivitas Anda di sini...</textarea>
         </div>
 
