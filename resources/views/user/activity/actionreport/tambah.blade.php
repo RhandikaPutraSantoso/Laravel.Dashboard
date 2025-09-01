@@ -186,12 +186,21 @@
         const alertBox = document.getElementById('alertBox');
         const confirmYes = document.getElementById('confirmYes');
         const confirmNo = document.getElementById('confirmNo');
+        const deskripsi = document.querySelector('textarea[name="deskripsi"]');
 
         let formSubmitTriggered = false;
 
         form.addEventListener('submit', (e) => {
             if (!formSubmitTriggered) {
                 e.preventDefault();
+
+                // 🚨 Validasi jumlah karakter deskripsi
+                if (deskripsi.value.length > 255) {
+                    alert("Deskripsi tidak boleh lebih dari 255 karakter!");
+                    return;
+                }
+
+                // Kalau valid → tampilkan alert custom
                 alertBox.style.display = 'flex';
             }
         });
@@ -205,10 +214,10 @@
         confirmNo.addEventListener('click', () => {
             alertBox.style.display = 'none';
             formSubmitTriggered = false;
-
         });
     });
 </script>
+
 </div>
 
 <script>
